@@ -44,8 +44,8 @@ public static class ObservabilityExtensions
             if (options.ExportToAgent365)
             {
                 targets |= ExportTarget.Agent365;
-                otel.Agent365.Exporter.UseS2SEndpoint = true;
-                otel.Agent365.Exporter.TokenResolver = async (agentId, tenantId) =>
+                otel.Agent365.UseS2SEndpoint = true;
+                otel.Agent365.TokenResolver = async (agentId, tenantId) =>
                 {
                     if (!string.Equals(agentId, options.AgentId, StringComparison.OrdinalIgnoreCase))
                     {
