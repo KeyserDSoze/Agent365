@@ -90,7 +90,8 @@ export const copy = {
       ['01', 'Setup & Register', 'Installa Agent 365 Skills, verifica i prerequisiti, crea blueprint e agent identity.', 'Tutorial onboarding', 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/tutorials/01-onboard-existing-agent.md'],
       ['02', 'Instrument', 'Aggiungi Microsoft OpenTelemetry Distro e valida prima localmente, poi verso Agent 365.', 'Observability tutorial', 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/tutorials/02-observability.md'],
       ['03', 'Protect & Govern', 'Collega Defender hunting, Purview DLP e tool/MCP governance al flusso operativo.', 'Security tutorials', 'https://github.com/KeyserDSoze/Agent365/tree/main/docs/tutorials'],
-      ['04', 'Validate & Operate', 'Controlla root span, licensing, auth, evidence e troubleshooting prima del go-live.', 'Reference samples', 'https://github.com/KeyserDSoze/Agent365/tree/main/examples/reference-agent']
+      ['04', 'Validate & Operate', 'Controlla root span, licensing, auth, evidence e troubleshooting prima del go-live.', 'Reference samples', 'https://github.com/KeyserDSoze/Agent365/tree/main/examples/reference-agent'],
+      ['05', 'Run the Golden Agent', 'Esegui il sample .NET reale con API, sessioni, tool, Docker e observability S2S opzionale.', 'Golden Agent .NET', 'https://github.com/KeyserDSoze/Agent365/tree/main/samples/dotnet-golden-agent']
     ],
     sourcesTitle: 'Source of truth',
     sourcesIntro: 'La knowledge base rimanda sempre alla documentazione Microsoft ufficiale. Le feature in Preview vanno ricontrollate prima di una decisione di produzione.',
@@ -177,7 +178,8 @@ export const copy = {
       ['01', 'Setup & Register', 'Install Agent 365 Skills, validate prerequisites, create the blueprint and agent identity.', 'Onboarding tutorial', 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/en/tutorials/01-onboard-existing-agent.md'],
       ['02', 'Instrument', 'Add Microsoft OpenTelemetry Distro and validate locally before Agent 365 export.', 'Observability tutorial', 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/en/tutorials/02-observability.md'],
       ['03', 'Protect & Govern', 'Connect Defender hunting, Purview DLP and tool/MCP governance to the operating flow.', 'Security tutorials', 'https://github.com/KeyserDSoze/Agent365/tree/main/docs/en/tutorials'],
-      ['04', 'Validate & Operate', 'Check root spans, licensing, auth, evidence and troubleshooting before go-live.', 'Reference samples', 'https://github.com/KeyserDSoze/Agent365/tree/main/examples/reference-agent']
+      ['04', 'Validate & Operate', 'Check root spans, licensing, auth, evidence and troubleshooting before go-live.', 'Reference samples', 'https://github.com/KeyserDSoze/Agent365/tree/main/examples/reference-agent'],
+      ['05', 'Run the Golden Agent', 'Run the real .NET sample with API hosting, sessions, tools, Docker and optional S2S observability.', 'Golden Agent .NET', 'https://github.com/KeyserDSoze/Agent365/tree/main/samples/dotnet-golden-agent']
     ],
     sourcesTitle: 'Source of truth',
     sourcesIntro: 'The knowledge base always points back to official Microsoft documentation. Preview features should be revalidated before production decisions.',
