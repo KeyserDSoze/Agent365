@@ -174,9 +174,9 @@ export const copy = {
     developerTitle: 'Developer path: from an existing agent to Agent 365',
     developerIntro: 'A practical path to register, instrument, validate and govern a custom agent without rebuilding its runtime or model.',
     developerSteps: [
-      ['01', 'Setup & Register', 'Install Agent 365 Skills, validate prerequisites, create the blueprint and agent identity.', 'Onboarding tutorial', 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/tutorials/01-onboard-existing-agent.md'],
-      ['02', 'Instrument', 'Add Microsoft OpenTelemetry Distro and validate locally before Agent 365 export.', 'Observability tutorial', 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/tutorials/02-observability.md'],
-      ['03', 'Protect & Govern', 'Connect Defender hunting, Purview DLP and tool/MCP governance to the operating flow.', 'Security tutorials', 'https://github.com/KeyserDSoze/Agent365/tree/main/docs/tutorials'],
+      ['01', 'Setup & Register', 'Install Agent 365 Skills, validate prerequisites, create the blueprint and agent identity.', 'Onboarding tutorial', 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/en/tutorials/01-onboard-existing-agent.md'],
+      ['02', 'Instrument', 'Add Microsoft OpenTelemetry Distro and validate locally before Agent 365 export.', 'Observability tutorial', 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/en/tutorials/02-observability.md'],
+      ['03', 'Protect & Govern', 'Connect Defender hunting, Purview DLP and tool/MCP governance to the operating flow.', 'Security tutorials', 'https://github.com/KeyserDSoze/Agent365/tree/main/docs/en/tutorials'],
       ['04', 'Validate & Operate', 'Check root spans, licensing, auth, evidence and troubleshooting before go-live.', 'Reference samples', 'https://github.com/KeyserDSoze/Agent365/tree/main/examples/reference-agent']
     ],
     sourcesTitle: 'Source of truth',
