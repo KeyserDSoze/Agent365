@@ -2,7 +2,7 @@
 
 ## Goal
 
-Run a real reference agent that clearly separates the agent runtime, model provider, tools, sessions, Agent 365 observability, configuration/secrets and HTTP hosting.
+Run a real reference agent while separating agent runtime, model provider, tools, sessions and Agent 365 observability.
 
 Project:
 
@@ -13,34 +13,31 @@ samples/dotnet-golden-agent/
 ## Stack
 
 - ASP.NET Core
-- Microsoft Agent Framework 1.23
-- Azure OpenAI
+- Microsoft Agent Framework
+- **Microsoft Foundry Local — default**
+- Azure OpenAI — optional provider
 - Microsoft OpenTelemetry Distro
 - Agent 365 custom-engine S2S observability
 
-## 1. Local-only boot
+## 1. Recommended path: Foundry Local
 
-The service can boot without Azure OpenAI configuration. This validates bootstrap, health, safe configuration and the local telemetry pipeline.
+On Windows:
 
-```bash
+```powershell
 cd samples/dotnet-golden-agent
-ASPNETCORE_URLS=http://localhost:8080 dotnet run
+.\scripts\start-foundry-local.ps1 -RunAgent
 ```
+
+The script prepares Foundry Local, downloads/loads the model and starts the API with the resolved local model ID and endpoint.
+
+See [Foundry Local as the model runtime](07-foundry-local.md).
+
+## 2. Health and safe config
 
 ```bash
 curl http://localhost:8080/health
 curl http://localhost:8080/api/config
 ```
-
-## 2. Configure Azure OpenAI
-
-```bash
-export Agent__AzureOpenAIEndpoint="https://YOUR-RESOURCE.openai.azure.com/"
-export Agent__Model="gpt-4o-mini"
-az login
-```
-
-The baseline uses Azure OpenAI Chat Completions through `IChatClient`, then creates an Agent Framework `AIAgent`.
 
 ## 3. First turn
 
@@ -50,71 +47,58 @@ curl -X POST http://localhost:8080/api/chat \
   -d '{"message":"What does policy AGENT-IDENTITY require?"}'
 ```
 
-Reuse the returned `conversationId` for subsequent turns.
+Reuse the returned `conversationId`.
 
-## 4. Tools
+## 4. Session safety
 
-The agent exposes:
+The store serializes turns per conversation ID to avoid concurrent access to the same `AgentSession`.
 
-- `LookupPolicy` — read-only mock lookup;
-- `CreateDraftChangeRequest` — write-shaped tool that creates a mock draft only and explicitly returns `externalSideEffect=false`.
+## 5. Tools
 
-## 5. Conversation safety
+- `LookupPolicy`: read-only mock.
+- `CreateDraftChangeRequest`: write-shaped mock with `externalSideEffect=false`.
 
-The in-memory store serializes turns per conversation ID so concurrent requests do not operate on the same `AgentSession` at the same time.
+Tool calling depends on the selected local model capability.
 
-## 6. Observability
-
-Default:
-
-```text
-Agent365__ExportToConsole=true
-Agent365__ExportToAgent365=false
-```
-
-Microsoft OpenTelemetry automatically instruments supported Agent Framework and Azure OpenAI activity.
-
-## 7. Agent 365 S2S
-
-The sample implements the custom-engine path using a standard Entra app registration and client credentials.
-
-Required permission:
-
-```text
-Agent365.Observability.OtelWrite — Application
-```
-
-Runtime configuration:
+## 6. Optional Azure OpenAI provider
 
 ```bash
-export Agent365__ExportToAgent365=true
-export Agent365__TenantId="<tenant>"
-export Agent365__AgentId="<app-client-id>"
-export Agent365__ClientSecret="<secret>"
+export Agent__Provider="azure-openai"
+export Agent__AzureOpenAIEndpoint="https://YOUR-RESOURCE.openai.azure.com/"
+export Agent__Model="<deployment-name>"
+az login
+dotnet run
 ```
 
-Scope:
+The provider boundary remains `IChatClient`.
+
+## 7. Observability
+
+Console is default. Agent 365 S2S export is optional and requires `Agent365.Observability.OtelWrite`.
+
+## 8. Docker
+
+When Foundry Local runs on the Windows host, the container reaches it through:
 
 ```text
-api://9b975845-388f-4429-889e-eab1ef63949c/.default
+http://host.docker.internal:39839/v1
 ```
 
-## 8. Definition of Done
+## 9. Definition of Done
 
 - [ ] restore/build/publish succeeds;
-- [ ] Docker build succeeds;
-- [ ] health returns 200;
-- [ ] safe config exposes no secret;
-- [ ] Azure OpenAI invocation works;
-- [ ] tools work as designed;
-- [ ] multi-turn conversation works;
-- [ ] console telemetry is visible;
-- [ ] tenant/agent baggage is present;
-- [ ] Agent 365 export is verified when enabled.
+- [ ] app health succeeds;
+- [ ] Docker build and container health succeed;
+- [ ] Foundry Local model is downloaded/loaded;
+- [ ] local model invocation works;
+- [ ] multi-turn works;
+- [ ] tools validated with a tool-capable model;
+- [ ] console telemetry visible;
+- [ ] Agent 365 export verified when enabled.
 
 ## Sources
 
-- https://learn.microsoft.com/en-us/agent-framework/agents/providers/azure-openai
+- https://learn.microsoft.com/en-us/windows/ai/foundry-local/get-started
+- https://learn.microsoft.com/en-us/azure/foundry-local/reference/reference-cli
 - https://learn.microsoft.com/en-us/agent-framework/concepts/agents
 - https://learn.microsoft.com/en-us/microsoft-agent-365/developer/microsoft-opentelemetry
-- https://learn.microsoft.com/en-us/microsoft-agent-365/developer/observability-authentication-setup

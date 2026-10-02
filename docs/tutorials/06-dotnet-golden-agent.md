@@ -2,17 +2,9 @@
 
 ## Obiettivo
 
-Eseguire un agente reference reale che separa chiaramente:
+Eseguire un agente reference reale separando runtime agentico, model provider, tool, sessione e Agent 365 observability.
 
-- runtime agentico;
-- model provider;
-- tool;
-- sessione;
-- Agent 365 observability;
-- configurazione e secret;
-- API/hosting.
-
-Il progetto è in:
+Progetto:
 
 ```text
 samples/dotnet-golden-agent/
@@ -21,43 +13,33 @@ samples/dotnet-golden-agent/
 ## Stack
 
 - ASP.NET Core
-- Microsoft Agent Framework 1.23
-- Azure OpenAI
+- Microsoft Agent Framework
+- **Microsoft Foundry Local — default**
+- Azure OpenAI — provider opzionale
 - Microsoft OpenTelemetry Distro
 - Agent 365 observability custom-engine S2S
 
-## 1. Avvio local-only
+## 1. Percorso raccomandato: Foundry Local
 
-Il servizio può partire anche senza endpoint Azure OpenAI. In questa modalità si possono validare:
+Su Windows:
 
-- bootstrap;
-- health endpoint;
-- configurazione pubblica;
-- pipeline OpenTelemetry locale.
-
-```bash
+```powershell
 cd samples/dotnet-golden-agent
-ASPNETCORE_URLS=http://localhost:8080 dotnet run
+.\scripts\start-foundry-local.ps1 -RunAgent
 ```
 
-Test:
+Lo script prepara Foundry Local, scarica/carica il modello e avvia l'API con model ID ed endpoint locali già configurati.
+
+Approfondimento: [Foundry Local come model runtime](07-foundry-local.md).
+
+## 2. Health e configurazione
 
 ```bash
 curl http://localhost:8080/health
 curl http://localhost:8080/api/config
 ```
 
-## 2. Configurare Azure OpenAI
-
-```bash
-export Agent__AzureOpenAIEndpoint="https://YOUR-RESOURCE.openai.azure.com/"
-export Agent__Model="gpt-4o-mini"
-az login
-```
-
-L'implementazione baseline usa Chat Completions tramite `IChatClient`, poi costruisce un `AIAgent`.
-
-Questo mantiene il runtime Agent Framework indipendente dal provider concreto.
+`/api/config` mostra provider e stato della configurazione ma non espone secret.
 
 ## 3. Primo turno
 
@@ -67,40 +49,32 @@ curl -X POST http://localhost:8080/api/chat \
   -d '{"message":"What does policy AGENT-IDENTITY require?"}'
 ```
 
-La risposta restituisce un `conversationId`.
+Riutilizzare il `conversationId` restituito per i turni successivi.
 
-## 4. Multi-turn
+## 4. Session safety
 
-Riutilizzare il conversation ID:
-
-```json
-{
-  "conversationId": "<id>",
-  "message": "Create a mock draft change request to align an agent to that policy."
-}
-```
-
-Il `ConversationStore` serializza i turni per conversation ID per evitare accesso concorrente alla stessa `AgentSession`.
+Il `ConversationStore` serializza i turni per conversation ID, evitando accesso concorrente alla stessa `AgentSession`.
 
 ## 5. Tool
 
-Il sample espone due function tool:
+- `LookupPolicy`: read-only mock.
+- `CreateDraftChangeRequest`: write-shaped mock con `externalSideEffect=false`.
 
-### LookupPolicy
-Read-only. Restituisce una policy mock.
+Il tool calling dipende dalle capability del modello locale scelto.
 
-### CreateDraftChangeRequest
-Simula una write action ma restituisce esclusivamente un draft con:
+## 6. Azure OpenAI opzionale
 
-```json
-{
-  "externalSideEffect": false
-}
+```bash
+export Agent__Provider="azure-openai"
+export Agent__AzureOpenAIEndpoint="https://YOUR-RESOURCE.openai.azure.com/"
+export Agent__Model="<deployment-name>"
+az login
+dotnet run
 ```
 
-Serve per insegnare che un tool apparentemente “operativo” deve essere esplicitamente classificato come mock, approval-required o production-write.
+Il boundary resta `IChatClient`, quindi Agent Framework e Agent 365 non cambiano.
 
-## 6. Observability locale
+## 7. Observability
 
 Default:
 
@@ -109,20 +83,7 @@ Agent365__ExportToConsole=true
 Agent365__ExportToAgent365=false
 ```
 
-Microsoft OpenTelemetry auto-instrumenta Agent Framework/Azure OpenAI supportati.
-
-## 7. Agent 365 S2S
-
-Il golden sample implementa il pattern **custom engine + standard Entra app registration + client credentials**.
-
-Prerequisiti:
-
-- app registration standard;
-- application permission `Agent365.Observability.OtelWrite`;
-- admin consent;
-- secret disponibile solo a runtime.
-
-Configurazione:
+Per Agent 365 S2S:
 
 ```bash
 export Agent365__ExportToAgent365=true
@@ -131,47 +92,42 @@ export Agent365__AgentId="<app-client-id>"
 export Agent365__ClientSecret="<secret>"
 ```
 
-Scope usato:
+Permission:
 
 ```text
-api://9b975845-388f-4429-889e-eab1ef63949c/.default
+Agent365.Observability.OtelWrite — Application
 ```
 
-Il sample verifica che `AgentId` e `TenantId` passati nel baggage coincidano con l'identità usata dal token resolver.
+## 8. Docker
 
-## 8. Baggage
+Con Foundry Local sull'host Windows, il container usa:
 
-Ogni turno crea un contesto:
+```text
+http://host.docker.internal:39839/v1
+```
 
-- tenant ID;
-- agent ID;
-- conversation ID.
-
-Questo è necessario perché l'exporter Agent 365 partiziona e valida la telemetry per tenant/agente.
-
-## 9. Docker
+Avvio:
 
 ```bash
 docker compose up --build
 ```
 
-## 10. Definition of Done
+## 9. Definition of Done
 
-- [ ] project restore/build/publish verdi;
-- [ ] container build verde;
-- [ ] `/health` risponde 200;
-- [ ] `/api/config` non espone secret;
-- [ ] Azure OpenAI invocation funzionante;
-- [ ] tool read-only invocato;
-- [ ] draft write tool invocato senza side effect;
-- [ ] conversation ID riusato correttamente;
+- [ ] restore/build/publish verdi;
+- [ ] app boot e `/health` verdi;
+- [ ] Docker build e container boot verdi;
+- [ ] Foundry Local model scaricato e caricato;
+- [ ] chiamata agente funzionante con model provider locale;
+- [ ] multi-turn verificato;
+- [ ] tool verificati con un modello che supporta tool calling;
 - [ ] console telemetry visibile;
-- [ ] baggage tenant/agent valorizzato;
-- [ ] export Agent 365 verificato in tenant, se abilitato.
+- [ ] Agent 365 export verificato se abilitato.
 
 ## Fonti
 
-- https://learn.microsoft.com/en-us/agent-framework/agents/providers/azure-openai
+- https://learn.microsoft.com/en-us/windows/ai/foundry-local/get-started
+- https://learn.microsoft.com/en-us/azure/foundry-local/reference/reference-cli
 - https://learn.microsoft.com/en-us/agent-framework/concepts/agents
 - https://learn.microsoft.com/en-us/microsoft-agent-365/developer/microsoft-opentelemetry
 - https://learn.microsoft.com/en-us/microsoft-agent-365/developer/observability-authentication-setup
