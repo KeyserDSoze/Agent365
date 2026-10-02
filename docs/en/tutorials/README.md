@@ -16,6 +16,7 @@ Recommended order:
 10. [Tool Governance Runtime](10-tool-governance-runtime.md)
 11. [Run Evidence & Observability Correlation](11-run-evidence-observability.md)
 12. [Operations Dashboard](12-operations-dashboard.md)
+13. [Governed .NET MCP Server](13-governed-mcp-server.md)
 
 Every tutorial should produce a verified configuration, evidence, a reusable artifact and a clear success/failure criterion.
 
