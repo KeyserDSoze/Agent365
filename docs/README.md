@@ -22,7 +22,7 @@ Questa cartella contiene la base teorica e formale. Il sito React in `src/` è l
 | 12 | [Labs](12-labs.md) | Hands-on e Definition of Done |
 | 13 | [Customer Delivery](13-customer-delivery.md) | Assessment, POC e roadmap |
 | 14 | [Official Sources](14-sources.md) | Source of truth |
-| 15 | [Connected Platforms](15-connected-platforms.md) | Integrazione e sync di piattaforme terze |
+| 15 | [Connected Platforms](15-connected-platforms.md) | Integrazione e sync di piattaforme terze |\n| 16 | [Local Model Runtime](16-local-model-runtime.md) | Foundry Local, LLM on-device e provider boundary |
 
 ## Metodo
 
