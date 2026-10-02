@@ -20,7 +20,7 @@ public sealed class AgentRuntime
     }
 
     public Task<AgentSession> CreateSessionAsync(CancellationToken cancellationToken) =>
-        _agent.Value.CreateSessionAsync(cancellationToken);
+        _agent.Value.CreateSessionAsync(cancellationToken).AsTask();
 
     public async Task<string> RunAsync(
         string message,
@@ -62,9 +62,8 @@ public sealed class AgentRuntime
         };
 
         return new AzureOpenAIClient(endpoint, new DefaultAzureCredential())
-            .GetResponsesClient()
+            .GetChatClient(_options.Model)
             .AsAIAgent(
-                model: _options.Model,
                 instructions: _options.Instructions,
                 name: _options.Name,
                 tools: tools);
