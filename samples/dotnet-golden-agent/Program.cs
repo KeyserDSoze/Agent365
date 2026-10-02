@@ -36,8 +36,10 @@ app.MapGet("/api/config", (IConfiguration configuration) =>
         agent = new
         {
             agent.Name,
+            agent.Provider,
             agent.Model,
-            endpointConfigured = !string.IsNullOrWhiteSpace(agent.AzureOpenAIEndpoint)
+            foundryLocalEndpoint = agent.FoundryLocalEndpoint,
+            azureOpenAIEndpointConfigured = !string.IsNullOrWhiteSpace(agent.AzureOpenAIEndpoint)
         },
         observability = new
         {
