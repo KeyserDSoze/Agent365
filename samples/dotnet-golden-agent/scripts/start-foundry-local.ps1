@@ -20,6 +20,61 @@ function Resolve-FoundryCommand {
     return $null
 }
 
+function Resolve-LoadedModelId {
+    param(
+        [string]$BaseUrl
+    )
+
+    $candidates = @(
+        "$BaseUrl/v1/models",
+        "$BaseUrl/openai/loadedmodels",
+        "$BaseUrl/openai/models"
+    )
+
+    foreach ($uri in $candidates) {
+        try {
+            $response = Invoke-RestMethod -Uri $uri -Method Get -TimeoutSec 10
+
+            if ($response.data -and $response.data.Count -gt 0 -and $response.data[0].id) {
+                return [string]$response.data[0].id
+            }
+
+            if ($response -is [System.Array] -and $response.Count -gt 0) {
+                if ($response[0] -is [string]) {
+                    return [string]$response[0]
+                }
+
+                if ($response[0].id) {
+                    return [string]$response[0].id
+                }
+
+                if ($response[0].name) {
+                    return [string]$response[0].name
+                }
+            }
+
+            if ($response.models -and $response.models.Count -gt 0) {
+                $candidate = $response.models[0]
+                if ($candidate -is [string]) {
+                    return [string]$candidate
+                }
+
+                if ($candidate.id) {
+                    return [string]$candidate.id
+                }
+
+                if ($candidate.name) {
+                    return [string]$candidate.name
+                }
+            }
+        } catch {
+            Write-Verbose "Model discovery endpoint failed: $uri :: $($_.Exception.Message)"
+        }
+    }
+
+    throw "Foundry Local is running, but no loaded model ID could be resolved from the documented model endpoints."
+}
+
 $foundry = Resolve-FoundryCommand
 
 if (-not $foundry) {
@@ -43,18 +98,7 @@ Write-Host "Preparing model alias '$ModelAlias'..."
 & $foundry model load $ModelAlias
 
 $baseUrl = "http://127.0.0.1:$Port"
-$models = Invoke-RestMethod -Uri "$baseUrl/v1/models" -Method Get
-
-$modelId = $null
-if ($models.data -and $models.data.Count -gt 0) {
-    $modelId = $models.data[0].id
-} elseif ($models -is [System.Array] -and $models.Count -gt 0) {
-    $modelId = [string]$models[0]
-}
-
-if (-not $modelId) {
-    throw "Foundry Local is running, but no loaded model was returned by /v1/models."
-}
+$modelId = Resolve-LoadedModelId -BaseUrl $baseUrl
 
 $env:Agent__Provider = "foundry-local"
 $env:Agent__FoundryLocalEndpoint = "$baseUrl/v1"
