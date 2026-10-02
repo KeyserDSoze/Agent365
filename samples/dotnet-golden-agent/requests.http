@@ -32,3 +32,40 @@ Content-Type: application/json
 
 ### Forget in-memory conversation
 DELETE {{host}}/api/conversations/replace-with-id-from-first-response
+
+### Tool registry
+GET {{host}}/api/tools
+# X-Api-Key: replace-if-enabled
+
+### Block a tool at runtime
+PUT {{host}}/api/tools/LookupPolicy/state
+Content-Type: application/json
+# X-Api-Key: replace-if-enabled
+
+{
+  "enabled": false
+}
+
+### Re-enable a tool
+PUT {{host}}/api/tools/LookupPolicy/state
+Content-Type: application/json
+# X-Api-Key: replace-if-enabled
+
+{
+  "enabled": true
+}
+
+### Create one-time approval for a governed write-shaped tool
+POST {{host}}/api/tool-approvals
+Content-Type: application/json
+# X-Api-Key: replace-if-enabled
+
+{
+  "toolName": "CreateDraftChangeRequest",
+  "conversationId": "replace-with-conversation-id",
+  "reason": "Human approved the mock draft action."
+}
+
+### Tool audit
+GET {{host}}/api/tool-audit?limit=50
+# X-Api-Key: replace-if-enabled
