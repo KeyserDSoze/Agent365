@@ -20,6 +20,34 @@ const sources = [
 
 const entries = []
 
+function normalizeSearchText(raw) {
+  return raw
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/[#>*_[\](){}|~]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function makeIndexEntry(relativePath, ext, raw, fallbackTitle) {
+  const firstHeading = raw.match(/^#\s+(.+)$/m)?.[1]?.trim()
+  const normalized = normalizeSearchText(raw)
+  const title = firstHeading || fallbackTitle
+
+  return {
+    path: relativePath,
+    title,
+    kind: ext === '.md' ? 'markdown' : 'code',
+    language: relativePath.startsWith('docs/en/')
+      ? 'en'
+      : relativePath.startsWith('docs/')
+        ? 'it'
+        : 'shared',
+    excerpt: normalized.slice(0, 240),
+    search: `${title} ${relativePath} ${normalized.slice(0, 16000)}`.toLowerCase()
+  }
+}
+
 async function copyTree(prefix, sourceDir) {
   const children = await readdir(sourceDir, { withFileTypes: true })
 
@@ -28,7 +56,7 @@ async function copyTree(prefix, sourceDir) {
     const relativePath = path.posix.join(prefix, child.name.replaceAll('\\', '/'))
 
     if (child.isDirectory()) {
-      if (['bin', 'obj', 'publish', 'node_modules'].includes(child.name)) continue
+      if (['bin', 'obj', 'publish', 'node_modules', 'lab-output'].includes(child.name)) continue
       await copyTree(relativePath, sourcePath)
       continue
     }
@@ -41,14 +69,7 @@ async function copyTree(prefix, sourceDir) {
     await cp(sourcePath, targetPath)
 
     const raw = await readFile(sourcePath, 'utf8')
-    const firstHeading = raw.match(/^#\s+(.+)$/m)?.[1]?.trim()
-
-    entries.push({
-      path: relativePath,
-      title: firstHeading || child.name,
-      kind: ext === '.md' ? 'markdown' : 'code',
-      language: relativePath.startsWith('docs/en/') ? 'en' : relativePath.startsWith('docs/') ? 'it' : 'shared'
-    })
+    entries.push(makeIndexEntry(relativePath, ext, raw, child.name))
   }
 }
 
@@ -64,21 +85,26 @@ for (const [prefix, source] of sources) {
 
 const rootReadme = path.join(repoRoot, 'README.md')
 try {
+  const raw = await readFile(rootReadme, 'utf8')
   await cp(rootReadme, path.join(destination, 'README.md'))
-  entries.unshift({
-    path: 'README.md',
-    title: 'Agent 365 Knowledge Hub',
-    kind: 'markdown',
-    language: 'shared'
-  })
+  entries.unshift(makeIndexEntry('README.md', '.md', raw, 'Agent 365 Knowledge Hub'))
 } catch {
   // Root README is optional during isolated app development.
 }
 
 entries.sort((a, b) => a.path.localeCompare(b.path))
+
 await writeFile(
   path.join(destination, 'index.json'),
-  JSON.stringify({ generatedAt: new Date().toISOString(), entries }, null, 2)
+  JSON.stringify(
+    {
+      generatedAt: new Date().toISOString(),
+      files: entries.length,
+      entries
+    },
+    null,
+    2
+  )
 )
 
-console.log(`Synced ${entries.length} knowledge-base files into public/content`)
+console.log(`Synced ${entries.length} searchable knowledge-base files into public/content`)
