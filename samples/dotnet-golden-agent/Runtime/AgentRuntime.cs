@@ -5,6 +5,8 @@ using Azure.Identity;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.AI;
 using Microsoft.Extensions.Options;
+using OpenAI;
+using System.ClientModel;
 
 namespace Agent365.GoldenAgent.Runtime;
 
@@ -37,22 +39,11 @@ public sealed class AgentRuntime
 
     private AIAgent CreateAgent()
     {
-        if (string.IsNullOrWhiteSpace(_options.AzureOpenAIEndpoint))
-        {
-            throw new InvalidOperationException(
-                "Agent:AzureOpenAIEndpoint is not configured. " +
-                "Set Agent__AzureOpenAIEndpoint before calling /api/chat.");
-        }
-
-        if (!Uri.TryCreate(_options.AzureOpenAIEndpoint, UriKind.Absolute, out var endpoint))
-        {
-            throw new InvalidOperationException(
-                "Agent:AzureOpenAIEndpoint must be an absolute URI.");
-        }
-
         if (string.IsNullOrWhiteSpace(_options.Model))
         {
-            throw new InvalidOperationException("Agent:Model is not configured.");
+            throw new InvalidOperationException(
+                "Agent:Model is not configured. " +
+                "For Foundry Local, run scripts/start-foundry-local.ps1 first.");
         }
 
         var tools = new List<AITool>
@@ -61,16 +52,50 @@ public sealed class AgentRuntime
             AIFunctionFactory.Create(CreateDraftChangeRequest)
         };
 
-        IChatClient chatClient = new AzureOpenAIClient(
-                endpoint,
-                new DefaultAzureCredential())
-            .GetChatClient(_options.Model)
-            .AsIChatClient();
+        IChatClient chatClient = _options.Provider.Trim().ToLowerInvariant() switch
+        {
+            "foundry-local" => CreateFoundryLocalClient(),
+            "azure-openai" => CreateAzureOpenAIClient(),
+            _ => throw new InvalidOperationException(
+                $"Unsupported Agent:Provider '{_options.Provider}'. " +
+                "Supported values: foundry-local, azure-openai.")
+        };
 
         return chatClient.AsAIAgent(
             instructions: _options.Instructions,
             name: _options.Name,
             tools: tools);
+    }
+
+    private IChatClient CreateFoundryLocalClient()
+    {
+        if (!Uri.TryCreate(_options.FoundryLocalEndpoint, UriKind.Absolute, out var endpoint))
+        {
+            throw new InvalidOperationException(
+                "Agent:FoundryLocalEndpoint must be an absolute URI.");
+        }
+
+        return new OpenAIClient(
+                new ApiKeyCredential("foundry-local"),
+                new OpenAIClientOptions { Endpoint = endpoint })
+            .GetChatClient(_options.Model)
+            .AsIChatClient();
+    }
+
+    private IChatClient CreateAzureOpenAIClient()
+    {
+        if (!Uri.TryCreate(_options.AzureOpenAIEndpoint, UriKind.Absolute, out var endpoint))
+        {
+            throw new InvalidOperationException(
+                "Agent:AzureOpenAIEndpoint must be configured with an absolute URI " +
+                "when Agent:Provider is azure-openai.");
+        }
+
+        return new AzureOpenAIClient(
+                endpoint,
+                new DefaultAzureCredential())
+            .GetChatClient(_options.Model)
+            .AsIChatClient();
     }
 
     [Description("Returns a mock internal governance policy summary for the requested policy code.")]
