@@ -24,6 +24,11 @@
 - https://learn.microsoft.com/en-us/microsoft-agent-365/developer/microsoft-opentelemetry
 - https://learn.microsoft.com/en-us/microsoft-agent-365/developer/observability-concepts
 
+## MCP / Tooling
+- https://github.com/modelcontextprotocol/csharp-sdk
+- https://learn.microsoft.com/en-us/dotnet/ai/quickstarts/build-mcp-server
+- https://modelcontextprotocol.io/docs/develop/build-server
+
 ## Local AI / Foundry Local
 - https://learn.microsoft.com/en-us/windows/ai/apis/local-llms
 - https://learn.microsoft.com/en-us/windows/ai/foundry-local/get-started

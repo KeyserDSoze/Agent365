@@ -1,0 +1,20 @@
+{
+  "servers": {
+    "agic-agent365-governed-tools": {
+      "type": "stdio",
+      "command": "dotnet",
+      "args": [
+        "run",
+        "--project",
+        "samples/mcp-governed-tools/Agent365.GovernedMcpServer.csproj",
+        "--no-launch-profile"
+      ],
+      "env": {
+        "AGIC_MCP_ENABLE_POLICY_LOOKUP": "true",
+        "AGIC_MCP_ENABLE_DRAFT_CHANGE_REQUEST": "true",
+        "AGIC_MCP_REQUIRE_APPROVAL_FOR_DRAFT": "false",
+        "AGIC_MCP_AUDIT_CAPACITY": "200"
+      }
+    }
+  }
+}

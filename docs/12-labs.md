@@ -50,5 +50,9 @@ Run ID, trace ID, evidence privacy-safe, correlation tool audit e summary operat
 Evidence export, KPI, filtri, run drill-down e tool decision correlation.  
 **Output:** operations export JSON + dashboard walkthrough.
 
+## LAB 13 — Governed MCP Server
+Stdio, tool discovery, risk metadata, block policy, operator approval e audit metadata-only.  
+**Output:** MCP manifest + handshake/invocation evidence.
+
 ## CAPSTONE
 Current-state assessment, baseline, architecture, risk, identity, security/data control, operating model, POC charter, 30/60/90, demo 20 minuti.

@@ -15,7 +15,8 @@ await mkdir(destination, { recursive: true })
 const sources = [
   ['docs', path.join(repoRoot, 'docs')],
   ['examples', path.join(repoRoot, 'examples')],
-  ['samples/dotnet-golden-agent', path.join(repoRoot, 'samples', 'dotnet-golden-agent')]
+  ['samples/dotnet-golden-agent', path.join(repoRoot, 'samples', 'dotnet-golden-agent')],
+  ['samples/mcp-governed-tools', path.join(repoRoot, 'samples', 'mcp-governed-tools')]
 ]
 
 const entries = []

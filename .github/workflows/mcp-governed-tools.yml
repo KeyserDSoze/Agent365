@@ -1,0 +1,51 @@
+name: Validate Governed MCP Server
+
+on:
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        working-directory: samples/mcp-governed-tools
+        run: dotnet restore ./tests/Agent365.GovernedMcpServer.Tests.csproj
+
+      - name: Build server
+        working-directory: samples/mcp-governed-tools
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Build tests
+        working-directory: samples/mcp-governed-tools
+        run: dotnet build ./tests/Agent365.GovernedMcpServer.Tests.csproj --configuration Release --no-restore
+
+      - name: Unit and stdio integration tests
+        working-directory: samples/mcp-governed-tools
+        run: dotnet test ./tests/Agent365.GovernedMcpServer.Tests.csproj --configuration Release --no-build
+
+      - name: Publish
+        working-directory: samples/mcp-governed-tools
+        run: dotnet publish --configuration Release --no-restore -o ./publish
+
+      - name: Verify stdio safety
+        shell: bash
+        run: |
+          if grep -R --line-number --include='*.cs' 'Console\.WriteLine' samples/mcp-governed-tools; then
+            echo "Console.WriteLine is forbidden in stdio MCP server source."
+            exit 1
+          fi
+          test -f samples/mcp-governed-tools/publish/Agent365.GovernedMcpServer.dll

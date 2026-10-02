@@ -82,8 +82,8 @@ Avoid automatically duplicating full prompts or sensitive tool arguments into th
 
 ## Golden sample
 
-The golden sample implements:
-- in-process registry;
+The golden sample implements **in-process** governance:
+- registry;
 - risk metadata;
 - runtime block/unblock;
 - one-time approval;
@@ -92,6 +92,27 @@ The golden sample implements:
 - replay prevention.
 
 Tutorial: `tutorials/10-tool-governance-runtime.md`.
+
+## External MCP server
+
+The repository also contains a real stdio MCP server:
+
+```text
+samples/mcp-governed-tools/
+```
+
+It moves the tool boundary outside the agent runtime and demonstrates:
+- real MCP tool discovery;
+- operation/risk metadata;
+- local block policy;
+- a write-shaped tool with no external side effect;
+- operator-provisioned approval;
+- metadata-only audit;
+- real client/server handshake and invocation tests.
+
+Client-side agent policy, server-side MCP policy and Agent 365 tenant governance are complementary enforcement layers.
+
+Tutorial: `tutorials/13-governed-mcp-server.md`.
 
 ## Output
 
