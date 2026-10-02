@@ -70,12 +70,11 @@ app.MapPost("/api/chat", async (
 
     try
     {
-        var session = await conversations.GetOrCreateAsync(
+        var response = await conversations.RunAsync(
             conversationId,
+            request.Message,
             runtime,
             cancellationToken);
-
-        var response = await runtime.RunAsync(request.Message, session, cancellationToken);
 
         return Results.Ok(new ChatResponse(
             conversationId,
