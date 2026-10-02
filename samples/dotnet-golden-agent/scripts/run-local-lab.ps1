@@ -190,9 +190,33 @@ try {
 
     $report.responses.secondTurn = $second
     $report.checks.multiTurn = $true
+
+    Write-Host ""
+    Write-Host "=== 6. Run evidence correlation ==="
+
+    $evidence = Invoke-RestMethod -Uri "$agentUrl/api/evidence/runs?conversationId=$($first.conversationId)&limit=10" -Method Get
+    $report.responses.runEvidence = $evidence
+
+    $matchingRunIds = @($evidence.items | ForEach-Object { [string]$_.runId })
+    $report.checks.runEvidence = (
+        $matchingRunIds.Count -ge 2 -and
+        $matchingRunIds -contains [string]$first.runId -and
+        $matchingRunIds -contains [string]$second.runId
+    )
+
+    if (-not $report.checks.runEvidence) {
+        throw "Run evidence did not correlate both Agent Framework turns."
+    }
+
+    if ($evidence.capturesContent -ne $false) {
+        throw "Run evidence unexpectedly reports content capture."
+    }
+
     $report.success = $true
 
-    Write-Host "Agent response: $($second.output)"
+    Write-Host "Evidence correlated run IDs:"
+    Write-Host "  first:  $($first.runId)"
+    Write-Host "  second: $($second.runId)"
     Write-Host ""
     Write-Host "LOCAL LAB: PASS"
 }
