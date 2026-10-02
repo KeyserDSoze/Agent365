@@ -92,3 +92,22 @@ samples/dotnet-golden-agent/lab-output/operations-export.json
 ```
 
 That file can be loaded directly into the dashboard.
+
+
+## Governed MCP server
+
+The repository includes a standalone real MCP stdio server under:
+
+```text
+samples/mcp-governed-tools/
+```
+
+It uses the official C# MCP SDK and demonstrates:
+- real stdio transport and tool discovery;
+- read-only and write-shaped tools;
+- risk metadata and local block policy;
+- operator-provisioned approval;
+- metadata-only bounded audit;
+- real MCP client/server handshake and invocation tests.
+
+The MCP sample is intentionally independent from the .NET 8 golden agent.
