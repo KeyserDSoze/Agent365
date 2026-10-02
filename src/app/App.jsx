@@ -80,6 +80,28 @@ export default function App() {
 
   const openKnowledge = path => setKnowledgeDocument(path, { push: true, scroll: true })
 
+  const toggleLanguage = () => {
+    const next = lang === 'it' ? 'en' : 'it'
+
+    if (knowledgePath.startsWith('docs/en/') && next === 'it') {
+      setKnowledgeDocument(
+        knowledgePath.replace(/^docs\/en\//, 'docs/'),
+        { push: true, scroll: false }
+      )
+      return
+    }
+
+    if (knowledgePath.startsWith('docs/') && !knowledgePath.startsWith('docs/en/') && next === 'en') {
+      setKnowledgeDocument(
+        `docs/en/${knowledgePath.slice('docs/'.length)}`,
+        { push: true, scroll: false }
+      )
+      return
+    }
+
+    setLang(next)
+  }
+
   useEffect(() => {
     const handlePopState = () => {
       const doc = readDocFromUrl()
@@ -115,7 +137,7 @@ export default function App() {
           )}
         </nav>
         <div className="controls">
-          <button className="control-btn" onClick={() => setLang(lang === 'it' ? 'en' : 'it')} title="Language">
+          <button className="control-btn" onClick={toggleLanguage} title="Language">
             {lang.toUpperCase()}
           </button>
           <button className="control-btn" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} title="Theme">
