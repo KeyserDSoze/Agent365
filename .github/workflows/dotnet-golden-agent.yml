@@ -39,3 +39,27 @@ jobs:
       - name: Publish
         working-directory: samples/dotnet-golden-agent
         run: dotnet publish --configuration Release --no-build --output ./publish
+
+      - name: Smoke test local-only boot
+        working-directory: samples/dotnet-golden-agent
+        shell: bash
+        run: |
+          ASPNETCORE_URLS=http://127.0.0.1:5055 \
+          Agent365__ExportToConsole=false \
+          dotnet ./publish/Agent365.GoldenAgent.dll > /tmp/golden-agent.log 2>&1 &
+          pid=$!
+          trap 'kill $pid 2>/dev/null || true' EXIT
+
+          for i in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:5055/health > /tmp/health.json; then
+              break
+            fi
+            sleep 1
+          done
+
+          curl --fail --silent http://127.0.0.1:5055/health
+          curl --fail --silent http://127.0.0.1:5055/api/config
+
+      - name: Validate Docker build
+        working-directory: samples/dotnet-golden-agent
+        run: docker build -t agent365-golden-agent:ci .
