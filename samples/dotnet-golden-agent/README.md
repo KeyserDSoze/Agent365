@@ -217,6 +217,64 @@ api://9b975845-388f-4429-889e-eab1ef63949c/.default
 
 Never commit the secret.
 
+## Operational hardening
+
+The lab profile is intentionally easy to run. For a POC, guardrails can be enabled without changing code.
+
+### Health and readiness
+
+```text
+GET /health
+GET /ready
+```
+
+- `/health`: the process is alive.
+- `/ready`: the configured model runtime is ready enough for inference.
+
+### Optional access key
+
+```text
+Api__RequireApiKey=true
+Api__ApiKey=<secret>
+```
+
+Protected endpoints expect:
+
+```text
+X-Api-Key: <secret>
+```
+
+The key is never returned by `/api/config`.
+
+### Rate and input limits
+
+```text
+Api__RequestsPerMinute=30
+Api__MaxMessageCharacters=8000
+Api__MaxConversationIdCharacters=128
+```
+
+### In-memory conversation guardrails
+
+```text
+Conversations__MaxConversations=200
+Conversations__IdleTimeoutMinutes=30
+```
+
+### Safe diagnostics
+
+```text
+GET /api/diagnostics
+```
+
+Returns provider readiness and conversation counters without returning secrets.
+
+The repository includes HTTP integration tests for these guardrails.
+
+See:
+- `docs/tutorials/09-golden-agent-hardening.md`
+- `docs/en/tutorials/09-golden-agent-hardening.md`
+
 ## Docker
 
 Build and boot:
