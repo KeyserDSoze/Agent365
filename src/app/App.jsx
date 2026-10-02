@@ -6,6 +6,10 @@ function Icon({ children }) {
   return <span className="icon" aria-hidden="true">{children}</span>
 }
 
+function readDocFromUrl() {
+  return new URLSearchParams(window.location.search).get('doc') || ''
+}
+
 function CodePreview() {
   return (
     <pre className="code">
@@ -17,10 +21,15 @@ function CodePreview() {
 }
 
 export default function App() {
-  const [lang, setLang] = useState(() => localStorage.getItem('a365-lang') || 'it')
+  const [lang, setLang] = useState(() => {
+    const doc = readDocFromUrl()
+    if (doc.startsWith('docs/en/')) return 'en'
+    if (doc.startsWith('docs/')) return 'it'
+    return localStorage.getItem('a365-lang') || 'it'
+  })
   const [theme, setTheme] = useState(() => localStorage.getItem('a365-theme') || 'dark')
   const [query, setQuery] = useState('')
-  const [knowledgePath, setKnowledgePath] = useState('')
+  const [knowledgePath, setKnowledgePath] = useState(() => readDocFromUrl())
   const t = copy[lang]
   const resourcePaths = [
     'examples/kql/01-agent-inventory.kql',
@@ -53,10 +62,45 @@ export default function App() {
 
   const jump = id => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 
-  const openKnowledge = path => {
+  const setKnowledgeDocument = (path, { push = true, scroll = true } = {}) => {
     setKnowledgePath(path)
-    requestAnimationFrame(() => jump('knowledge'))
+
+    const url = new URL(window.location.href)
+    if (path) url.searchParams.set('doc', path)
+    else url.searchParams.delete('doc')
+
+    if (push) window.history.pushState({ doc: path }, '', url)
+    else window.history.replaceState({ doc: path }, '', url)
+
+    if (path.startsWith('docs/en/')) setLang('en')
+    else if (path.startsWith('docs/')) setLang('it')
+
+    if (scroll) requestAnimationFrame(() => jump('knowledge'))
   }
+
+  const openKnowledge = path => setKnowledgeDocument(path, { push: true, scroll: true })
+
+  useEffect(() => {
+    const handlePopState = () => {
+      const doc = readDocFromUrl()
+      setKnowledgePath(doc)
+
+      if (doc.startsWith('docs/en/')) setLang('en')
+      else if (doc.startsWith('docs/')) setLang('it')
+
+      if (doc) requestAnimationFrame(() => jump('knowledge'))
+    }
+
+    window.addEventListener('popstate', handlePopState)
+
+    if (knowledgePath) {
+      requestAnimationFrame(() => jump('knowledge'))
+    }
+
+    return () => window.removeEventListener('popstate', handlePopState)
+    // Initial URL hydration and browser history handling only.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="page-shell">
@@ -265,7 +309,7 @@ export default function App() {
           <MarkdownViewer
             lang={lang}
             requestedPath={knowledgePath}
-            onPathChange={setKnowledgePath}
+            onPathChange={path => setKnowledgeDocument(path, { push: true, scroll: false })}
           />
         </section>
 
