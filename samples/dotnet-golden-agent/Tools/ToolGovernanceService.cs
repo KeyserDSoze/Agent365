@@ -24,6 +24,16 @@ public sealed class ToolGovernanceService
         _context = context;
     }
 
+    public int AuditCount => _audit.Count;
+    public int PendingApprovalCount
+    {
+        get
+        {
+            RemoveExpiredApprovals();
+            return _approvals.Count;
+        }
+    }
+
     public IReadOnlyList<ToolDescriptor> GetCatalog() =>
     [
         BuildDescriptor(
