@@ -12,6 +12,7 @@ Questa sezione porta la knowledge base dal piano teorico all'esecuzione.
 6. [Golden Agent .NET end-to-end](06-dotnet-golden-agent.md)
 7. [Foundry Local come model runtime](07-foundry-local.md)
 8. [Local Lab Runner end-to-end](08-local-lab-runner.md)
+9. [Hardening operativo del Golden Agent](09-golden-agent-hardening.md)
 
 ## Regola
 
