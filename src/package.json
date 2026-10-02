@@ -4,13 +4,18 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
+    "sync-content": "node scripts/copy-content.mjs",
+    "predev": "npm run sync-content",
     "dev": "vite",
+    "prebuild": "npm run sync-content",
     "build": "vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "react": "^19.1.1",
-    "react-dom": "^19.1.1"
+    "react-dom": "^19.1.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^5.0.0",

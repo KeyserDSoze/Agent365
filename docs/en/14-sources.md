@@ -2,7 +2,7 @@
 
 **Verified:** 2026-10-02.
 
-## Core
+## Agent 365 core
 - https://learn.microsoft.com/en-us/microsoft-agent-365/
 - https://learn.microsoft.com/en-us/microsoft-agent-365/overview
 - https://learn.microsoft.com/en-us/microsoft-365/admin/manage/agent-365-overview?view=o365-worldwide
@@ -24,8 +24,15 @@
 - https://learn.microsoft.com/en-us/microsoft-agent-365/developer/microsoft-opentelemetry
 - https://learn.microsoft.com/en-us/microsoft-agent-365/developer/observability-concepts
 
+## Local AI / Foundry Local
+- https://learn.microsoft.com/en-us/windows/ai/apis/local-llms
+- https://learn.microsoft.com/en-us/windows/ai/foundry-local/get-started
+- https://learn.microsoft.com/en-us/windows/ai/windows-ai-comparison
+- https://learn.microsoft.com/en-us/azure/foundry-local/reference/reference-sdk-current
+- https://learn.microsoft.com/en-us/azure/foundry-local/reference/reference-cli
+
 ## Training / FastTrack
 - https://learn.microsoft.com/en-us/training/paths/agent-365-solutions/
 - https://learn.microsoft.com/en-us/microsoft-365/fasttrack/microsoft-agent-365
 
-Re-check licensing, Preview/GA status, roles, Defender schema, telemetry retention/residency, connected-platform support and SDK/CLI commands before delivery.
+Re-check licensing, Preview/GA status, roles, Defender schema, telemetry retention/residency, connected-platform support, model/tool capabilities and SDK/CLI behavior before delivery.

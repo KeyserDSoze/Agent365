@@ -1,0 +1,86 @@
+name: Validate .NET Golden Agent
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "samples/dotnet-golden-agent/**"
+      - ".github/workflows/dotnet-golden-agent.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "samples/dotnet-golden-agent/**"
+      - ".github/workflows/dotnet-golden-agent.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        working-directory: samples/dotnet-golden-agent
+        run: dotnet restore
+
+      - name: Build
+        working-directory: samples/dotnet-golden-agent
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish
+        working-directory: samples/dotnet-golden-agent
+        run: dotnet publish --configuration Release --no-build --output ./publish
+
+      - name: Smoke test local-only boot
+        working-directory: samples/dotnet-golden-agent
+        shell: bash
+        run: |
+          ASPNETCORE_URLS=http://127.0.0.1:5055 \
+          Agent365__ExportToConsole=false \
+          dotnet ./publish/Agent365.GoldenAgent.dll > /tmp/golden-agent.log 2>&1 &
+          pid=$!
+          trap 'kill $pid 2>/dev/null || true' EXIT
+
+          for i in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:5055/health > /tmp/health.json; then
+              break
+            fi
+            sleep 1
+          done
+
+          curl --fail --silent http://127.0.0.1:5055/health
+          curl --fail --silent http://127.0.0.1:5055/api/config
+
+      - name: Validate Docker build
+        working-directory: samples/dotnet-golden-agent
+        run: docker build -t agent365-golden-agent:ci .
+
+      - name: Smoke test container
+        shell: bash
+        run: |
+          docker run -d --rm \
+            --name agent365-golden-agent-ci \
+            -p 5056:8080 \
+            -e Agent365__ExportToConsole=false \
+            agent365-golden-agent:ci
+
+          trap 'docker stop agent365-golden-agent-ci >/dev/null 2>&1 || true' EXIT
+
+          for i in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:5056/health > /tmp/container-health.json; then
+              break
+            fi
+            sleep 1
+          done
+
+          curl --fail --silent http://127.0.0.1:5056/health
+          curl --fail --silent http://127.0.0.1:5056/api/config

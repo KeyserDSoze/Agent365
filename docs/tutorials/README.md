@@ -9,6 +9,8 @@ Questa sezione porta la knowledge base dal piano teorico all'esecuzione.
 3. [Defender Advanced Hunting](03-defender-hunting.md)
 4. [Purview DLP integration](04-purview-dlp.md)
 5. [Troubleshooting playbook](05-troubleshooting.md)
+6. [Golden Agent .NET end-to-end](06-dotnet-golden-agent.md)
+7. [Foundry Local come model runtime](07-foundry-local.md)
 
 ## Regola
 
