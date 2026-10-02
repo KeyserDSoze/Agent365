@@ -20,6 +20,16 @@ export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('a365-theme') || 'dark')
   const [query, setQuery] = useState('')
   const t = copy[lang]
+  const resourceUrls = [
+    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/kql/01-agent-inventory.kql',
+    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/kql/02-governance-gaps.kql',
+    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/kql/03-agent-tools-mcp.kql',
+    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/checklists/tenant-readiness.md',
+    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/templates/identity-design-sheet.md',
+    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/templates/tool-risk-register.csv',
+    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/templates/data-interaction-matrix.csv',
+    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/checklists/customer-discovery.md'
+  ]
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
@@ -75,6 +85,16 @@ export default function App() {
             <div className="hero-actions">
               <button className="primary" onClick={() => jump('architecture')}>{t.primaryCta} →</button>
               <button className="secondary" onClick={() => jump('training')}>{t.secondaryCta}</button>
+              <a
+                className="secondary doc-link"
+                href={lang === 'it'
+                  ? 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/README.md'
+                  : 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/en/README.md'}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Docs {lang.toUpperCase()} ↗
+              </a>
             </div>
             <div className="hero-facts">
               <div><span>{t.status}</span><strong>{t.ga}</strong></div>
@@ -162,11 +182,11 @@ export default function App() {
           </div>
           <div className="asset-list">
             {t.examples.map(([title, text], i) => (
-              <div className="asset" key={title}>
+              <a className="asset asset-link" href={resourceUrls[i]} target="_blank" rel="noreferrer" key={title}>
                 <span>{String(i + 1).padStart(2, '0')}</span>
                 <div><h3>{title}</h3><p>{text}</p></div>
-                <b>→</b>
-              </div>
+                <b>↗</b>
+              </a>
             ))}
           </div>
         </section>
