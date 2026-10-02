@@ -85,8 +85,8 @@ Evitare di duplicare automaticamente prompt o argomenti sensibili nel log di gov
 
 ## Golden sample
 
-Il golden sample implementa:
-- registry in-process;
+Il golden sample implementa governance **in-process**:
+- registry;
 - risk metadata;
 - runtime block/unblock;
 - approval one-shot;
@@ -95,6 +95,30 @@ Il golden sample implementa:
 - replay prevention.
 
 Tutorial: `tutorials/10-tool-governance-runtime.md`.
+
+## MCP server esterno
+
+La repository include anche un server MCP stdio reale:
+
+```text
+samples/mcp-governed-tools/
+```
+
+Questo sample sposta il tool boundary fuori dal runtime agente e dimostra:
+- tool discovery MCP reale;
+- manifest con operation e risk tier;
+- block policy;
+- write-shaped tool senza side effect esterno;
+- approval operator-provisioned;
+- audit metadata-only;
+- handshake e invocation testati con il client MCP ufficiale.
+
+La governance del custom agent e quella del server MCP sono complementari:
+- il client/agent decide se il server/tool è autorizzato nel proprio contesto;
+- il server applica comunque la propria policy locale;
+- Agent 365 aggiunge il control plane tenant-wide.
+
+Tutorial: `tutorials/13-governed-mcp-server.md`.
 
 ## Decision questions
 
