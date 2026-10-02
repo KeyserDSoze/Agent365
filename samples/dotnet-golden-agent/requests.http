@@ -69,3 +69,11 @@ Content-Type: application/json
 ### Tool audit
 GET {{host}}/api/tool-audit?limit=50
 # X-Api-Key: replace-if-enabled
+
+### Run evidence summary
+GET {{host}}/api/evidence/summary
+# X-Api-Key: replace-if-enabled
+
+### Run evidence for one conversation
+GET {{host}}/api/evidence/runs?conversationId=replace-with-conversation-id&limit=20
+# X-Api-Key: replace-if-enabled
