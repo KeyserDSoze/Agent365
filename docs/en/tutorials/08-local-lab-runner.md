@@ -73,7 +73,10 @@ including:
 
 - `latest.json`;
 - timestamped JSON reports;
+- `operations-export.json`;
 - stdout/stderr logs.
+
+`operations-export.json` uses the `agent365-golden-agent-evidence/v1` schema and can be loaded directly into the site's **Operations** dashboard.
 
 The folder is ignored by Git.
 
