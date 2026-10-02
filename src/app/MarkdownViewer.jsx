@@ -18,7 +18,7 @@ function languageForPath(path) {
 }
 
 function groupLabel(path, lang) {
-  if (path === 'README.md') return lang === 'it' ? 'Repository' : 'Repository'
+  if (path === 'README.md') return 'Repository'
   if (path.includes('/tutorials/')) return lang === 'it' ? 'Tutorial pratici' : 'Hands-on tutorials'
   if (path.startsWith('docs/en/')) return 'Academy EN'
   if (path.startsWith('docs/')) return 'Academy IT'
@@ -42,13 +42,34 @@ function codeLanguage(path) {
   })[ext] || 'text'
 }
 
+function slugify(value) {
+  return String(value ?? '')
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+}
+
+function headingText(children) {
+  if (Array.isArray(children)) return children.map(headingText).join('')
+  if (typeof children === 'string' || typeof children === 'number') return String(children)
+  return ''
+}
+
 export default function MarkdownViewer({ lang, requestedPath, onPathChange }) {
   const [index, setIndex] = useState([])
-  const [selectedPath, setSelectedPath] = useState(requestedPath || (lang === 'it' ? 'docs/README.md' : 'docs/en/README.md'))
+  const [selectedPath, setSelectedPath] = useState(
+    requestedPath || (lang === 'it' ? 'docs/README.md' : 'docs/en/README.md')
+  )
   const [body, setBody] = useState('')
   const [kind, setKind] = useState('markdown')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [search, setSearch] = useState('')
+  const [copied, setCopied] = useState(false)
 
   const baseUrl = `${import.meta.env.BASE_URL}content/`
 
@@ -84,6 +105,7 @@ export default function MarkdownViewer({ lang, requestedPath, onPathChange }) {
 
     setLoading(true)
     setError('')
+    setCopied(false)
 
     const entry = index.find(x => x.path === selectedPath)
     setKind(entry?.kind || (selectedPath.endsWith('.md') ? 'markdown' : 'code'))
@@ -101,12 +123,32 @@ export default function MarkdownViewer({ lang, requestedPath, onPathChange }) {
       .finally(() => setLoading(false))
   }, [baseUrl, index, selectedPath])
 
-  const visibleEntries = useMemo(() => {
-    return index.filter(entry => {
-      if (entry.language === 'shared') return true
-      return entry.language === lang
-    })
+  const languageEntries = useMemo(() => {
+    return index.filter(entry => entry.language === 'shared' || entry.language === lang)
   }, [index, lang])
+
+  const visibleEntries = useMemo(() => {
+    const q = search.trim().toLowerCase()
+    if (!q) return languageEntries
+
+    const terms = q.split(/\s+/).filter(Boolean)
+
+    return languageEntries
+      .map(entry => {
+        const haystack = entry.search || `${entry.title} ${entry.path} ${entry.excerpt || ''}`.toLowerCase()
+        const score = terms.reduce((acc, term) => {
+          if (entry.title.toLowerCase().includes(term)) return acc + 6
+          if (entry.path.toLowerCase().includes(term)) return acc + 3
+          if (haystack.includes(term)) return acc + 1
+          return -999
+        }, 0)
+
+        return { entry, score }
+      })
+      .filter(x => x.score >= 0)
+      .sort((a, b) => b.score - a.score || a.entry.path.localeCompare(b.entry.path))
+      .map(x => x.entry)
+  }, [languageEntries, search])
 
   const groups = useMemo(() => {
     const grouped = new Map()
@@ -118,10 +160,37 @@ export default function MarkdownViewer({ lang, requestedPath, onPathChange }) {
     return [...grouped.entries()]
   }, [visibleEntries, lang])
 
+  const currentIndex = languageEntries.findIndex(entry => entry.path === selectedPath)
+  const previous = currentIndex > 0 ? languageEntries[currentIndex - 1] : null
+  const next = currentIndex >= 0 && currentIndex < languageEntries.length - 1
+    ? languageEntries[currentIndex + 1]
+    : null
+
   const navigate = path => {
     if (!path) return
     setSelectedPath(path)
     onPathChange?.(path)
+  }
+
+  const copyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      setCopied(true)
+      window.setTimeout(() => setCopied(false), 1800)
+    } catch {
+      setCopied(false)
+    }
+  }
+
+  const scrollToHeading = hash => {
+    const id = decodeURIComponent(hash.replace(/^#/, ''))
+    const element = document.getElementById(id)
+    element?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  const heading = Tag => ({ children, ...props }) => {
+    const id = slugify(headingText(children))
+    return <Tag id={id} {...props}>{children}</Tag>
   }
 
   const markdown = kind === 'markdown'
@@ -135,7 +204,24 @@ export default function MarkdownViewer({ lang, requestedPath, onPathChange }) {
           <span>{lang === 'it' ? 'CONTENUTI' : 'CONTENTS'}</span>
           <strong>{visibleEntries.length}</strong>
         </div>
+
+        <label className="kb-search">
+          <span>⌕</span>
+          <input
+            value={search}
+            onChange={event => setSearch(event.target.value)}
+            placeholder={lang === 'it' ? 'Cerca in tutti i contenuti…' : 'Search all content…'}
+          />
+          {search && <button onClick={() => setSearch('')} aria-label="Clear search">×</button>}
+        </label>
+
         <div className="kb-nav">
+          {groups.length === 0 && (
+            <p className="kb-empty">
+              {lang === 'it' ? 'Nessun contenuto trovato.' : 'No matching content.'}
+            </p>
+          )}
+
           {groups.map(([label, entries]) => (
             <div className="kb-group" key={label}>
               <p>{label}</p>
@@ -147,7 +233,10 @@ export default function MarkdownViewer({ lang, requestedPath, onPathChange }) {
                   title={entry.path}
                 >
                   <span>{entry.kind === 'markdown' ? '¶' : '⌘'}</span>
-                  {entry.title}
+                  <span className="kb-entry-copy">
+                    <strong>{entry.title}</strong>
+                    {search && entry.excerpt && <small>{entry.excerpt}</small>}
+                  </span>
                 </button>
               ))}
             </div>
@@ -157,17 +246,21 @@ export default function MarkdownViewer({ lang, requestedPath, onPathChange }) {
 
       <article className="kb-viewer">
         <div className="kb-toolbar">
-          <div>
+          <div className="kb-toolbar-path">
             <span>{kind === 'markdown' ? 'MARKDOWN' : 'SOURCE'}</span>
             <code>{selectedPath}</code>
           </div>
-          <a
-            href={`https://github.com/KeyserDSoze/Agent365/blob/main/${selectedPath}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            GitHub ↗
-          </a>
+
+          <div className="kb-toolbar-actions">
+            <button onClick={copyLink}>{copied ? 'Copied ✓' : (lang === 'it' ? 'Copia link' : 'Copy link')}</button>
+            <a
+              href={`https://github.com/KeyserDSoze/Agent365/blob/main/${selectedPath}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              GitHub ↗
+            </a>
+          </div>
         </div>
 
         <div className="markdown-body">
@@ -177,7 +270,26 @@ export default function MarkdownViewer({ lang, requestedPath, onPathChange }) {
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
+                h1: heading('h1'),
+                h2: heading('h2'),
+                h3: heading('h3'),
+                h4: heading('h4'),
                 a({ href, children, ...props }) {
+                  if (href?.startsWith('#')) {
+                    return (
+                      <a
+                        href={href}
+                        onClick={event => {
+                          event.preventDefault()
+                          scrollToHeading(href)
+                        }}
+                        {...props}
+                      >
+                        {children}
+                      </a>
+                    )
+                  }
+
                   const internal = resolveRelative(selectedPath, href)
                   const isKnowledgeFile = internal && index.some(x => x.path === internal)
 
@@ -206,6 +318,19 @@ export default function MarkdownViewer({ lang, requestedPath, onPathChange }) {
             >
               {markdown}
             </ReactMarkdown>
+          )}
+
+          {!loading && !error && (
+            <nav className="kb-page-nav">
+              <button disabled={!previous} onClick={() => navigate(previous?.path)}>
+                <span>←</span>
+                <small>{previous?.title || (lang === 'it' ? 'Inizio' : 'Start')}</small>
+              </button>
+              <button disabled={!next} onClick={() => navigate(next?.path)}>
+                <small>{next?.title || (lang === 'it' ? 'Fine' : 'End')}</small>
+                <span>→</span>
+              </button>
+            </nav>
           )}
         </div>
       </article>
