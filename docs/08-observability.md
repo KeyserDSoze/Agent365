@@ -19,6 +19,38 @@ Sono documentati tre percorsi:
 
 Un run viene rappresentato come una struttura di span OpenTelemetry. Gli span possono rappresentare invocazione agente, tool call, inference/model call e risposta finale. Per correlare correttamente la telemetry servono attributi di identità e contesto coerenti.
 
+## Correlation model
+
+Per i custom agent usare almeno tre chiavi distinte:
+
+- **conversation ID**: identifica il filo multi-turn;
+- **run ID**: identifica una singola esecuzione applicativa;
+- **trace ID**: collega il run agli span W3C/OpenTelemetry.
+
+Il golden sample crea un root `invoke_agent` per ogni `POST /api/chat` e propaga run/conversation/trace fino al tool audit.
+
+Questo consente di rispondere a domande come:
+- quali tool sono stati invocati in quel run?
+- quali decisioni sono state deny?
+- quale provider/modello era configurato?
+- quanto è durato il run?
+- il run è fallito prima o dopo una tool invocation?
+
+## Privacy-safe evidence
+
+La telemetry operativa non deve automaticamente duplicare prompt, response e tool arguments.
+
+Il golden sample mantiene un evidence store metadata-only con:
+- provider/model;
+- status;
+- duration;
+- request/response character counts;
+- tool allow/deny counts;
+- error type;
+- correlation IDs.
+
+Il contenuto completo rimane fuori dall'evidence store locale.
+
 ## Data handling e retention — stato verificato 2026-10-02
 
 La pagina Microsoft aggiornata il 30 settembre 2026 indica:
