@@ -42,3 +42,21 @@ If Pages was never enabled, open **Settings → Pages** and set **Source** to **
 This repository accelerates technical readiness; it does not replace Microsoft documentation. Revalidate Preview features, licensing, role requirements and service limitations before production decisions.
 
 Start from [docs/README.md](docs/README.md).
+
+
+## Hands-on developer path
+
+The repository now includes a practical developer track:
+
+- `docs/tutorials/` — Italian step-by-step tutorials
+- `docs/en/tutorials/` — English mirror
+- `examples/reference-agent/` — Python, Node.js and .NET observability integration skeletons
+- `examples/kql/advanced/` — additional Agent 365 hunting queries
+
+The recommended flow is:
+
+```text
+setup → register → instrument → tools/DLP → validate → operate
+```
+
+For new observability integrations, the project follows Microsoft's current recommendation to use **Microsoft OpenTelemetry Distro** rather than the deprecated Agent 365 Observability SDK.
