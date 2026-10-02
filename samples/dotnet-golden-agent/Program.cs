@@ -2,6 +2,7 @@ using Agent365.GoldenAgent.Configuration;
 using Agent365.GoldenAgent.Runtime;
 using Agent365.GoldenAgent.Telemetry;
 using Microsoft.OpenTelemetry;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,8 +13,6 @@ builder.Services.Configure<Agent365ObservabilityOptions>(
 
 builder.Services.AddSingleton<AgentRuntime>();
 builder.Services.AddSingleton<ConversationStore>();
-builder.Services.AddSingleton<Agent365TokenProvider>();
-
 builder.ConfigureAgent365Observability();
 
 var app = builder.Build();
