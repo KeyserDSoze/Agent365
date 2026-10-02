@@ -103,13 +103,42 @@ public sealed class ToolGovernanceService
         return approval;
     }
 
-    public IReadOnlyList<ToolAuditRecord> GetAudit(int limit = 50)
+    public ToolRunStats GetRunStats(string runId)
+    {
+        var records = _audit
+            .Where(x => string.Equals(x.RunId, runId, StringComparison.Ordinal))
+            .ToArray();
+
+        return new ToolRunStats(
+            Total: records.Length,
+            Allowed: records.Count(x => x.Decision == "allowed"),
+            Denied: records.Count(x => x.Decision == "denied"));
+    }
+
+    public IReadOnlyList<ToolAuditRecord> GetAudit(
+        int limit = 50,
+        string? runId = null,
+        string? conversationId = null)
     {
         var bounded = Math.Clamp(limit, 1, Math.Min(_options.AuditCapacity, 500));
-        return _audit
-            .Reverse()
-            .Take(bounded)
-            .ToArray();
+        IEnumerable<ToolAuditRecord> query = _audit.Reverse();
+
+        if (!string.IsNullOrWhiteSpace(runId))
+        {
+            query = query.Where(x =>
+                string.Equals(x.RunId, runId, StringComparison.Ordinal));
+        }
+
+        if (!string.IsNullOrWhiteSpace(conversationId))
+        {
+            query = query.Where(x =>
+                string.Equals(
+                    x.ConversationId,
+                    conversationId,
+                    StringComparison.Ordinal));
+        }
+
+        return query.Take(bounded).ToArray();
     }
 
     public ToolExecutionResult LookupPolicy(string policyCode)
@@ -214,17 +243,19 @@ public sealed class ToolGovernanceService
             var elapsed = Stopwatch.GetElapsedTime(started).TotalMilliseconds;
 
             AddAudit(new ToolAuditRecord(
-                DateTimeOffset.UtcNow,
-                _context.ConversationId,
-                tool.Name,
-                tool.Operation,
-                tool.RiskTier,
-                "allowed",
+                Timestamp: DateTimeOffset.UtcNow,
+                RunId: _context.RunId,
+                ConversationId: _context.ConversationId,
+                TraceId: _context.TraceId,
+                ToolName: tool.Name,
+                Operation: tool.Operation,
+                RiskTier: tool.RiskTier,
+                Decision: "allowed",
                 Success: true,
-                tool.ExternalSideEffect,
+                ExternalSideEffect: tool.ExternalSideEffect,
                 Reason: null,
-                approvalId,
-                elapsed));
+                ApprovalId: approvalId,
+                DurationMs: elapsed));
 
             return new ToolExecutionResult(
                 Allowed: true,
@@ -238,17 +269,19 @@ public sealed class ToolGovernanceService
             var elapsed = Stopwatch.GetElapsedTime(started).TotalMilliseconds;
 
             AddAudit(new ToolAuditRecord(
-                DateTimeOffset.UtcNow,
-                _context.ConversationId,
-                tool.Name,
-                tool.Operation,
-                tool.RiskTier,
-                "allowed",
+                Timestamp: DateTimeOffset.UtcNow,
+                RunId: _context.RunId,
+                ConversationId: _context.ConversationId,
+                TraceId: _context.TraceId,
+                ToolName: tool.Name,
+                Operation: tool.Operation,
+                RiskTier: tool.RiskTier,
+                Decision: "allowed",
                 Success: false,
-                tool.ExternalSideEffect,
-                ex.Message,
-                approvalId,
-                elapsed));
+                ExternalSideEffect: tool.ExternalSideEffect,
+                Reason: ex.Message,
+                ApprovalId: approvalId,
+                DurationMs: elapsed));
 
             return new ToolExecutionResult(
                 Allowed: true,
@@ -271,17 +304,19 @@ public sealed class ToolGovernanceService
         var elapsed = Stopwatch.GetElapsedTime(started).TotalMilliseconds;
 
         AddAudit(new ToolAuditRecord(
-            DateTimeOffset.UtcNow,
-            _context.ConversationId,
-            toolName,
-            operation,
-            riskTier,
-            "denied",
+            Timestamp: DateTimeOffset.UtcNow,
+            RunId: _context.RunId,
+            ConversationId: _context.ConversationId,
+            TraceId: _context.TraceId,
+            ToolName: toolName,
+            Operation: operation,
+            RiskTier: riskTier,
+            Decision: "denied",
             Success: false,
-            externalSideEffect,
-            reason,
-            approvalId,
-            elapsed));
+            ExternalSideEffect: externalSideEffect,
+            Reason: reason,
+            ApprovalId: approvalId,
+            DurationMs: elapsed));
 
         return new ToolExecutionResult(
             Allowed: false,

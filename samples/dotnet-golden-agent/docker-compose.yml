@@ -28,4 +28,6 @@ services:
       Tools__AllowRuntimePolicyChanges: ${Tools__AllowRuntimePolicyChanges:-true}
       Tools__ApprovalTtlMinutes: ${Tools__ApprovalTtlMinutes:-5}
       Tools__AuditCapacity: ${Tools__AuditCapacity:-500}
+      Evidence__Enabled: ${Evidence__Enabled:-true}
+      Evidence__Capacity: ${Evidence__Capacity:-500}
       A365_OBSERVABILITY_LOG_LEVEL: ${A365_OBSERVABILITY_LOG_LEVEL:-info}

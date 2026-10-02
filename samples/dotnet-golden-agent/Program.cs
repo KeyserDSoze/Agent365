@@ -43,6 +43,14 @@ builder.Services
     .ValidateOnStart();
 
 builder.Services
+    .AddOptions<RunEvidenceOptions>()
+    .Bind(builder.Configuration.GetSection(RunEvidenceOptions.SectionName))
+    .Validate(
+        options => options.Capacity is >= 10 and <= 10_000,
+        "Evidence:Capacity must be between 10 and 10000.")
+    .ValidateOnStart();
+
+builder.Services
     .AddOptions<ToolGovernanceOptions>()
     .Bind(builder.Configuration.GetSection(ToolGovernanceOptions.SectionName))
     .Validate(
@@ -88,6 +96,8 @@ builder.Services.AddHttpClient(
 
 builder.Services.AddSingleton<ToolInvocationContext>();
 builder.Services.AddSingleton<ToolGovernanceService>();
+builder.Services.AddSingleton<RunEvidenceStore>();
+builder.Services.AddSingleton<RunEvidenceService>();
 builder.Services.AddSingleton<AgentRuntime>();
 builder.Services.AddSingleton<ConversationStore>();
 builder.ConfigureAgent365Observability();
@@ -104,7 +114,8 @@ app.Use(async (context, next) =>
         context.Request.Path.StartsWithSegments("/api/diagnostics") ||
         context.Request.Path.StartsWithSegments("/api/tools") ||
         context.Request.Path.StartsWithSegments("/api/tool-audit") ||
-        context.Request.Path.StartsWithSegments("/api/tool-approvals");
+        context.Request.Path.StartsWithSegments("/api/tool-approvals") ||
+        context.Request.Path.StartsWithSegments("/api/evidence");
 
     if (protectedApi && !ApiKeyGuard.IsAuthorized(context, apiOptions))
     {
@@ -146,7 +157,8 @@ app.MapGet("/api/config", (
     IConfiguration configuration,
     IOptions<ApiOptions> api,
     IOptions<ConversationStoreOptions> conversations,
-    IOptions<ToolGovernanceOptions> tools) =>
+    IOptions<ToolGovernanceOptions> tools,
+    IOptions<RunEvidenceOptions> evidence) =>
 {
     var agent = configuration.GetSection(AgentRuntimeOptions.SectionName)
         .Get<AgentRuntimeOptions>() ?? new();
@@ -190,6 +202,12 @@ app.MapGet("/api/config", (
             tools.Value.AllowRuntimePolicyChanges,
             tools.Value.ApprovalTtlMinutes,
             tools.Value.AuditCapacity
+        },
+        evidence = new
+        {
+            evidence.Value.Enabled,
+            evidence.Value.Capacity,
+            capturesContent = false
         }
     });
 });
@@ -198,6 +216,7 @@ app.MapGet("/api/diagnostics", async (
     AgentRuntime runtime,
     ConversationStore conversations,
     ToolGovernanceService tools,
+    RunEvidenceStore evidence,
     CancellationToken cancellationToken) =>
 {
     var removedExpired = conversations.RemoveExpired();
@@ -217,7 +236,8 @@ app.MapGet("/api/diagnostics", async (
             registered = tools.GetCatalog().Count,
             auditEvents = tools.AuditCount,
             pendingApprovals = tools.PendingApprovalCount
-        }
+        },
+        evidence = evidence.GetSummary()
     });
 });
 
@@ -281,11 +301,38 @@ app.MapPost("/api/tool-approvals", (
 
 app.MapGet("/api/tool-audit", (
     int? limit,
+    string? runId,
+    string? conversationId,
     ToolGovernanceService tools) =>
 {
     return Results.Ok(new
     {
-        items = tools.GetAudit(limit ?? 50)
+        items = tools.GetAudit(
+            limit ?? 50,
+            runId,
+            conversationId)
+    });
+});
+
+app.MapGet("/api/evidence/runs", (
+    int? limit,
+    string? conversationId,
+    RunEvidenceStore evidence) =>
+{
+    return Results.Ok(new
+    {
+        capturesContent = false,
+        items = evidence.Get(limit ?? 50, conversationId)
+    });
+});
+
+app.MapGet("/api/evidence/summary", (
+    RunEvidenceStore evidence) =>
+{
+    return Results.Ok(new
+    {
+        capturesContent = false,
+        summary = evidence.GetSummary()
     });
 });
 
@@ -293,6 +340,7 @@ app.MapPost("/api/chat", async (
     ChatRequest request,
     AgentRuntime runtime,
     ConversationStore conversations,
+    RunEvidenceService runEvidence,
     IOptions<Agent365ObservabilityOptions> observabilityOptions,
     IOptions<ApiOptions> api,
     CancellationToken cancellationToken) =>
@@ -331,15 +379,23 @@ app.MapPost("/api/chat", async (
 
     try
     {
-        var response = await conversations.RunAsync(
+        var execution = await runEvidence.ExecuteAsync(
             conversationId,
             request.Message,
-            runtime,
+            (runId, traceId, ct) => conversations.RunAsync(
+                conversationId,
+                request.Message,
+                runId,
+                traceId,
+                runtime,
+                ct),
             cancellationToken);
 
         return Results.Ok(new ChatResponse(
             conversationId,
-            response,
+            execution.RunId,
+            execution.TraceId,
+            execution.Output,
             DateTimeOffset.UtcNow));
     }
     catch (ConversationCapacityException ex)
@@ -374,6 +430,11 @@ app.MapDelete("/api/conversations/{conversationId}", (
 app.Run();
 
 public sealed record ChatRequest(string Message, string? ConversationId);
-public sealed record ChatResponse(string ConversationId, string Output, DateTimeOffset Timestamp);
+public sealed record ChatResponse(
+    string ConversationId,
+    string RunId,
+    string TraceId,
+    string Output,
+    DateTimeOffset Timestamp);
 
 public partial class Program { }

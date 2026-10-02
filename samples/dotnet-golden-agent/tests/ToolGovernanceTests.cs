@@ -31,7 +31,7 @@ public sealed class ToolGovernanceTests
         var context = new ToolInvocationContext();
         var service = CreateService(context: context);
 
-        using var scope = context.Begin("conversation-block");
+        using var scope = context.Begin("conversation-block", "run-block", "trace-block");
         var updated = service.SetEnabled(
             ToolGovernanceService.PolicyLookupTool,
             enabled: false);
@@ -46,7 +46,9 @@ public sealed class ToolGovernanceTests
         Assert.Equal("Tool is blocked by policy.", result.Reason);
 
         var audit = Assert.Single(service.GetAudit());
+        Assert.Equal("run-block", audit.RunId);
         Assert.Equal("conversation-block", audit.ConversationId);
+        Assert.Equal("trace-block", audit.TraceId);
         Assert.Equal(ToolGovernanceService.PolicyLookupTool, audit.ToolName);
         Assert.Equal("denied", audit.Decision);
         Assert.False(audit.Success);
@@ -65,7 +67,7 @@ public sealed class ToolGovernanceTests
         var context = new ToolInvocationContext();
         var service = CreateService(options, context);
 
-        using var scope = context.Begin("conversation-approved");
+        using var scope = context.Begin("conversation-approved", "run-approved", "trace-approved");
 
         var denied = service.CreateDraftChangeRequest(
             "Enable governed tool",
@@ -117,7 +119,7 @@ public sealed class ToolGovernanceTests
 
         Assert.NotNull(approval);
 
-        using var scope = context.Begin("conversation-b");
+        using var scope = context.Begin("conversation-b", "run-cross", "trace-cross");
 
         var result = service.CreateDraftChangeRequest(
             "Cross conversation",

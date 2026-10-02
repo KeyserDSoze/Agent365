@@ -39,9 +39,14 @@ public sealed class AgentRuntime
         string message,
         AgentSession session,
         string conversationId,
+        string runId,
+        string traceId,
         CancellationToken cancellationToken)
     {
-        using var toolScope = _toolContext.Begin(conversationId);
+        using var toolScope = _toolContext.Begin(
+            conversationId,
+            runId,
+            traceId);
 
         AgentResponse response = await _agent.Value.RunAsync(
             message,

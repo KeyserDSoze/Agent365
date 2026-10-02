@@ -14,7 +14,9 @@ public sealed record ToolDescriptor(
 
 public sealed record ToolAuditRecord(
     DateTimeOffset Timestamp,
+    string RunId,
     string ConversationId,
+    string TraceId,
     string ToolName,
     string Operation,
     string RiskTier,
@@ -53,3 +55,8 @@ public sealed record ToolApprovalRequest(
     string ToolName,
     string ConversationId,
     string Reason);
+
+public sealed record ToolRunStats(
+    int Total,
+    int Allowed,
+    int Denied);

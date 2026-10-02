@@ -121,6 +121,64 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
+    public async Task Evidence_IsPrivacySafeAndRecordsFailedRuns()
+    {
+        using var client = _factory.CreateClient();
+
+        const string privateMarker = "PRIVATE-CONTENT-MUST-NOT-BE-STORED";
+
+        using var chat = await client.PostAsJsonAsync(
+            "/api/chat",
+            new
+            {
+                conversationId = "evidence-conversation",
+                message = privateMarker
+            });
+
+        Assert.Equal(HttpStatusCode.ServiceUnavailable, chat.StatusCode);
+
+        var json = await client.GetStringAsync(
+            "/api/evidence/runs?conversationId=evidence-conversation");
+
+        Assert.True(json.Contains("\"capturesContent\":false", StringComparison.OrdinalIgnoreCase));
+        Assert.True(json.Contains("\"status\":\"failed\"", StringComparison.OrdinalIgnoreCase));
+        Assert.True(json.Contains("\"runId\"", StringComparison.OrdinalIgnoreCase));
+        Assert.True(json.Contains("\"traceId\"", StringComparison.OrdinalIgnoreCase));
+        Assert.False(json.Contains(privateMarker, StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public async Task EvidenceSummary_IsAvailable()
+    {
+        using var client = _factory.CreateClient();
+
+        var json = await client.GetStringAsync("/api/evidence/summary");
+
+        Assert.True(json.Contains("\"capturesContent\":false", StringComparison.OrdinalIgnoreCase));
+        Assert.True(json.Contains("\"bufferedRuns\"", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task Evidence_IsProtected_WhenApiKeyIsRequired()
+    {
+        using var factory = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.UseSetting("Api:RequireApiKey", "true");
+            builder.UseSetting("Api:ApiKey", "unit-test-secret");
+        });
+
+        using var client = factory.CreateClient();
+
+        using var unauthorized = await client.GetAsync("/api/evidence/runs");
+        Assert.Equal(HttpStatusCode.Unauthorized, unauthorized.StatusCode);
+
+        client.DefaultRequestHeaders.Add("X-Api-Key", "unit-test-secret");
+
+        using var authorized = await client.GetAsync("/api/evidence/runs");
+        Assert.Equal(HttpStatusCode.OK, authorized.StatusCode);
+    }
+
+    [Fact]
     public async Task Chat_RejectsOversizedMessages()
     {
         using var factory = _factory.WithWebHostBuilder(builder =>

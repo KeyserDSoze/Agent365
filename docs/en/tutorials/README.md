@@ -14,6 +14,7 @@ Recommended order:
 8. [End-to-end Local Lab Runner](08-local-lab-runner.md)
 9. [Golden Agent operational hardening](09-golden-agent-hardening.md)
 10. [Tool Governance Runtime](10-tool-governance-runtime.md)
+11. [Run Evidence & Observability Correlation](11-run-evidence-observability.md)
 
 Every tutorial should produce a verified configuration, evidence, a reusable artifact and a clear success/failure criterion.
 
