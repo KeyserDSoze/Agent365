@@ -3,6 +3,7 @@ using Agent365.GoldenAgent.Configuration;
 using Agent365.GoldenAgent.Runtime;
 using Agent365.GoldenAgent.Security;
 using Agent365.GoldenAgent.Telemetry;
+using Agent365.GoldenAgent.Tools;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Options;
 
@@ -41,6 +42,17 @@ builder.Services
         "Conversations:IdleTimeoutMinutes must be between 1 and 1440.")
     .ValidateOnStart();
 
+builder.Services
+    .AddOptions<ToolGovernanceOptions>()
+    .Bind(builder.Configuration.GetSection(ToolGovernanceOptions.SectionName))
+    .Validate(
+        options => options.ApprovalTtlMinutes is >= 1 and <= 60,
+        "Tools:ApprovalTtlMinutes must be between 1 and 60.")
+    .Validate(
+        options => options.AuditCapacity is >= 10 and <= 10_000,
+        "Tools:AuditCapacity must be between 10 and 10000.")
+    .ValidateOnStart();
+
 var configuredApi = builder.Configuration
     .GetSection(ApiOptions.SectionName)
     .Get<ApiOptions>() ?? new ApiOptions();
@@ -74,6 +86,8 @@ builder.Services.AddHttpClient(
     "provider-readiness",
     client => client.Timeout = TimeSpan.FromSeconds(3));
 
+builder.Services.AddSingleton<ToolInvocationContext>();
+builder.Services.AddSingleton<ToolGovernanceService>();
 builder.Services.AddSingleton<AgentRuntime>();
 builder.Services.AddSingleton<ConversationStore>();
 builder.ConfigureAgent365Observability();
@@ -87,7 +101,10 @@ app.Use(async (context, next) =>
     var protectedApi =
         context.Request.Path.StartsWithSegments("/api/chat") ||
         context.Request.Path.StartsWithSegments("/api/conversations") ||
-        context.Request.Path.StartsWithSegments("/api/diagnostics");
+        context.Request.Path.StartsWithSegments("/api/diagnostics") ||
+        context.Request.Path.StartsWithSegments("/api/tools") ||
+        context.Request.Path.StartsWithSegments("/api/tool-audit") ||
+        context.Request.Path.StartsWithSegments("/api/tool-approvals");
 
     if (protectedApi && !ApiKeyGuard.IsAuthorized(context, apiOptions))
     {
@@ -128,7 +145,8 @@ app.MapGet("/ready", async (
 app.MapGet("/api/config", (
     IConfiguration configuration,
     IOptions<ApiOptions> api,
-    IOptions<ConversationStoreOptions> conversations) =>
+    IOptions<ConversationStoreOptions> conversations,
+    IOptions<ToolGovernanceOptions> tools) =>
 {
     var agent = configuration.GetSection(AgentRuntimeOptions.SectionName)
         .Get<AgentRuntimeOptions>() ?? new();
@@ -163,6 +181,15 @@ app.MapGet("/api/config", (
         {
             conversations.Value.MaxConversations,
             conversations.Value.IdleTimeoutMinutes
+        },
+        tools = new
+        {
+            tools.Value.EnablePolicyLookup,
+            tools.Value.EnableDraftChangeRequest,
+            tools.Value.RequireApprovalForDraftChangeRequest,
+            tools.Value.AllowRuntimePolicyChanges,
+            tools.Value.ApprovalTtlMinutes,
+            tools.Value.AuditCapacity
         }
     });
 });
@@ -170,6 +197,7 @@ app.MapGet("/api/config", (
 app.MapGet("/api/diagnostics", async (
     AgentRuntime runtime,
     ConversationStore conversations,
+    ToolGovernanceService tools,
     CancellationToken cancellationToken) =>
 {
     var removedExpired = conversations.RemoveExpired();
@@ -183,7 +211,81 @@ app.MapGet("/api/diagnostics", async (
         {
             active = conversations.Count,
             removedExpired
+        },
+        tools = new
+        {
+            registered = tools.GetCatalog().Count,
+            auditEvents = tools.AuditCount,
+            pendingApprovals = tools.PendingApprovalCount
         }
+    });
+});
+
+app.MapGet("/api/tools", (
+    ToolGovernanceService tools,
+    IOptions<ToolGovernanceOptions> options) =>
+{
+    return Results.Ok(new
+    {
+        runtimePolicyChanges = options.Value.AllowRuntimePolicyChanges,
+        items = tools.GetCatalog()
+    });
+});
+
+app.MapPut("/api/tools/{toolName}/state", (
+    string toolName,
+    ToolStateUpdate update,
+    ToolGovernanceService tools,
+    IOptions<ToolGovernanceOptions> options) =>
+{
+    if (!options.Value.AllowRuntimePolicyChanges)
+    {
+        return Results.Json(
+            new { error = "runtime_policy_changes_disabled" },
+            statusCode: StatusCodes.Status403Forbidden);
+    }
+
+    var updated = tools.SetEnabled(toolName, update.Enabled);
+
+    return updated is null
+        ? Results.NotFound(new { error = "tool_not_found", toolName })
+        : Results.Ok(updated);
+});
+
+app.MapPost("/api/tool-approvals", (
+    ToolApprovalRequest request,
+    ToolGovernanceService tools) =>
+{
+    if (string.IsNullOrWhiteSpace(request.ToolName) ||
+        string.IsNullOrWhiteSpace(request.ConversationId))
+    {
+        return Results.BadRequest(new
+        {
+            error = "toolName and conversationId are required"
+        });
+    }
+
+    var approval = tools.CreateApproval(
+        request.ToolName.Trim(),
+        request.ConversationId.Trim(),
+        request.Reason);
+
+    return approval is null
+        ? Results.BadRequest(new
+        {
+            error = "tool_not_found_or_approval_not_required",
+            request.ToolName
+        })
+        : Results.Created($"/api/tool-approvals/{approval.Id}", approval);
+});
+
+app.MapGet("/api/tool-audit", (
+    int? limit,
+    ToolGovernanceService tools) =>
+{
+    return Results.Ok(new
+    {
+        items = tools.GetAudit(limit ?? 50)
     });
 });
 
