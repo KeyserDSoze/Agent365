@@ -21,7 +21,7 @@ export const copy = {
     principle: 'Principio guida',
     principleText: 'Agent 365 è un control plane trasversale: non “vive dentro Defender”. Microsoft 365 admin center, Entra, Defender e Purview cooperano su piani diversi.',
     nav: {
-      overview: 'Overview', architecture: 'Architettura', domains: 'Domini', examples: 'Esempi', training: 'Training', labs: 'Lab', developer: 'Developer', knowledge: 'Knowledge', sources: 'Fonti'
+      overview: 'Overview', architecture: 'Architettura', domains: 'Domini', examples: 'Esempi', training: 'Training', labs: 'Lab', developer: 'Developer', operations: 'Operations', knowledge: 'Knowledge', sources: 'Fonti'
     },
     overviewTitle: 'La mappa mentale',
     overviewIntro: 'Per lavorare bene su Agent 365 bisogna distinguere il control plane dai runtime degli agenti. Il valore è portare inventory, identity, access, data protection, threat protection e observability dentro un modello operativo coerente.',
@@ -118,7 +118,7 @@ export const copy = {
     principle: 'Guiding principle',
     principleText: 'Agent 365 is a cross-cutting control plane: it does not “live inside Defender”. Microsoft 365 admin center, Entra, Defender and Purview cooperate across distinct planes.',
     nav: {
-      overview: 'Overview', architecture: 'Architecture', domains: 'Domains', examples: 'Examples', training: 'Training', labs: 'Labs', developer: 'Developer', knowledge: 'Knowledge', sources: 'Sources'
+      overview: 'Overview', architecture: 'Architecture', domains: 'Domains', examples: 'Examples', training: 'Training', labs: 'Labs', developer: 'Developer', operations: 'Operations', knowledge: 'Knowledge', sources: 'Sources'
     },
     overviewTitle: 'The mental model',
     overviewIntro: 'To work effectively with Agent 365, separate the control plane from agent runtimes. The value is bringing inventory, identity, access, data protection, threat protection and observability into one operating model.',
