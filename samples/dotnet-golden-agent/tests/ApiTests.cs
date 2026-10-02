@@ -68,6 +68,59 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
+    public async Task ToolRegistry_IsAvailable()
+    {
+        using var client = _factory.CreateClient();
+
+        var json = await client.GetStringAsync("/api/tools");
+
+        Assert.True(json.Contains("LookupPolicy", StringComparison.Ordinal));
+        Assert.True(json.Contains("CreateDraftChangeRequest", StringComparison.Ordinal));
+        Assert.True(json.Contains("riskTier", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task ToolRegistry_IsProtected_WhenApiKeyIsRequired()
+    {
+        using var factory = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.UseSetting("Api:RequireApiKey", "true");
+            builder.UseSetting("Api:ApiKey", "unit-test-secret");
+        });
+
+        using var client = factory.CreateClient();
+
+        using var unauthorized = await client.GetAsync("/api/tools");
+        Assert.Equal(HttpStatusCode.Unauthorized, unauthorized.StatusCode);
+
+        client.DefaultRequestHeaders.Add("X-Api-Key", "unit-test-secret");
+
+        using var authorized = await client.GetAsync("/api/tools");
+        Assert.Equal(HttpStatusCode.OK, authorized.StatusCode);
+    }
+
+    [Fact]
+    public async Task RuntimeToolState_CanBeChanged()
+    {
+        using var client = _factory.CreateClient();
+
+        using var blocked = await client.PutAsJsonAsync(
+            "/api/tools/LookupPolicy/state",
+            new { enabled = false });
+
+        Assert.Equal(HttpStatusCode.OK, blocked.StatusCode);
+
+        var json = await blocked.Content.ReadAsStringAsync();
+        Assert.True(json.Contains("\"enabled\":false", StringComparison.OrdinalIgnoreCase));
+
+        using var enabled = await client.PutAsJsonAsync(
+            "/api/tools/LookupPolicy/state",
+            new { enabled = true });
+
+        Assert.Equal(HttpStatusCode.OK, enabled.StatusCode);
+    }
+
+    [Fact]
     public async Task Chat_RejectsOversizedMessages()
     {
         using var factory = _factory.WithWebHostBuilder(builder =>
