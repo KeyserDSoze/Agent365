@@ -4,8 +4,12 @@ services:
     ports:
       - "8080:8080"
     environment:
+      Agent__Provider: ${Agent__Provider:-foundry-local}
+      # Inside Docker, use host.docker.internal to reach Foundry Local on Windows host.
+      Agent__FoundryLocalEndpoint: ${Agent__FoundryLocalEndpoint:-http://host.docker.internal:39839/v1}
       Agent__AzureOpenAIEndpoint: ${Agent__AzureOpenAIEndpoint:-}
-      Agent__Model: ${Agent__Model:-gpt-4o-mini}
+      Agent__Model: ${Agent__Model:-}
+      Agent__Name: ${Agent__Name:-AGIC-Agent365-GoldenAgent}
       Agent365__ExportToConsole: "true"
       Agent365__ExportToAgent365: ${Agent365__ExportToAgent365:-false}
       Agent365__AgentId: ${Agent365__AgentId:-}
