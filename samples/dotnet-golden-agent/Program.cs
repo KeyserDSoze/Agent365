@@ -57,7 +57,7 @@ builder.Services.AddRateLimiter(options =>
                 error = "rate_limit_exceeded",
                 retryAfterSeconds = 60
             },
-            cancellationToken);
+            cancellationToken: cancellationToken);
     };
 
     options.AddFixedWindowLimiter("chat", limiter =>
@@ -274,4 +274,4 @@ app.Run();
 public sealed record ChatRequest(string Message, string? ConversationId);
 public sealed record ChatResponse(string ConversationId, string Output, DateTimeOffset Timestamp);
 
-public partial class Program;
+public partial class Program { }
