@@ -336,6 +336,25 @@ app.MapGet("/api/evidence/summary", (
     });
 });
 
+app.MapGet("/api/evidence/export", (
+    int? limit,
+    RunEvidenceStore evidence,
+    ToolGovernanceService tools) =>
+{
+    var bounded = Math.Clamp(limit ?? 200, 1, 500);
+
+    return Results.Ok(new
+    {
+        schema = "agent365-golden-agent-evidence/v1",
+        generatedAt = DateTimeOffset.UtcNow,
+        capturesContent = false,
+        summary = evidence.GetSummary(),
+        runs = evidence.Get(bounded),
+        toolAudit = tools.GetAudit(bounded),
+        tools = tools.GetCatalog()
+    });
+});
+
 app.MapPost("/api/chat", async (
     ChatRequest request,
     AgentRuntime runtime,
