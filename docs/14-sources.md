@@ -1,0 +1,29 @@
+# 14 — Official Microsoft Sources
+
+**Verified:** 2026-10-02.
+
+## Core
+- https://learn.microsoft.com/en-us/microsoft-agent-365/
+- https://learn.microsoft.com/en-us/microsoft-agent-365/overview
+- https://learn.microsoft.com/en-us/microsoft-365/admin/manage/agent-365-overview?view=o365-worldwide
+- https://learn.microsoft.com/en-us/microsoft-365/copilot/agent-essentials/agent-essentials-overview
+
+## Identity
+- https://learn.microsoft.com/en-us/entra/agent-id/
+- https://learn.microsoft.com/en-us/microsoft-agent-365/guidance/entra-agent-365
+
+## Security
+- https://learn.microsoft.com/en-us/security/security-for-ai/agent-365-security
+- https://learn.microsoft.com/en-us/defender-xdr/security-for-ai/transition-agent-security-to-agent-365
+- https://learn.microsoft.com/en-us/microsoft-365/security/defender/advanced-hunting-schema-changes?view=o365-worldwide
+
+## Developer
+- https://learn.microsoft.com/en-us/microsoft-agent-365/developer/agent-365-cli
+- https://learn.microsoft.com/en-us/microsoft-agent-365/developer/reference/cli/
+
+## Training / FastTrack
+- https://learn.microsoft.com/en-us/training/paths/agent-365-solutions/
+- https://learn.microsoft.com/en-us/microsoft-365/fasttrack/microsoft-agent-365
+
+## Re-check before delivery
+Licensing, Preview/GA state, role requirements, Defender schema, telemetry retention/residency, connected-platform support and SDK/CLI commands.

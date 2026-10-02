@@ -1,0 +1,5 @@
+// Starter pattern. Inspect schema first.
+AgentsInfo
+| where isempty(Owner) or isempty(AgentName)
+| project Timestamp, AgentName, AgentId, AgentType, Platform, Owner, Status
+| order by Timestamp desc

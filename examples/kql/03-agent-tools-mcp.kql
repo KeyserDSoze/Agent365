@@ -1,0 +1,5 @@
+// RawAgentInfo is useful for platform-specific metadata. Validate availability.
+AgentsInfo
+| where tostring(RawAgentInfo) has_any ("MCP", "tool", "connector")
+| project Timestamp, AgentName, AgentId, Platform, RawAgentInfo
+| order by Timestamp desc

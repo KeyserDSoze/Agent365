@@ -1,0 +1,2 @@
+Agent,DataSource,Classification,Operation,Destination,PolicyOrControl,ExpectedEvidence,Owner,Risk,Mitigation
+ExampleAgent,SharePoint HR,Confidential,Read+Summarize,Internal user,DLP + access scope,Audit event,owner@example.com,Medium,Limit audience and review access
