@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { copy, officialLinks } from './content.js'
+import MarkdownViewer from './MarkdownViewer.jsx'
 
 function Icon({ children }) {
   return <span className="icon" aria-hidden="true">{children}</span>
@@ -19,16 +20,17 @@ export default function App() {
   const [lang, setLang] = useState(() => localStorage.getItem('a365-lang') || 'it')
   const [theme, setTheme] = useState(() => localStorage.getItem('a365-theme') || 'dark')
   const [query, setQuery] = useState('')
+  const [knowledgePath, setKnowledgePath] = useState('')
   const t = copy[lang]
-  const resourceUrls = [
-    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/kql/01-agent-inventory.kql',
-    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/kql/02-governance-gaps.kql',
-    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/kql/03-agent-tools-mcp.kql',
-    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/checklists/tenant-readiness.md',
-    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/templates/identity-design-sheet.md',
-    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/templates/tool-risk-register.csv',
-    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/templates/data-interaction-matrix.csv',
-    'https://github.com/KeyserDSoze/Agent365/blob/main/examples/checklists/customer-discovery.md'
+  const resourcePaths = [
+    'examples/kql/01-agent-inventory.kql',
+    'examples/kql/02-governance-gaps.kql',
+    'examples/kql/03-agent-tools-mcp.kql',
+    'examples/checklists/tenant-readiness.md',
+    'examples/templates/identity-design-sheet.md',
+    'examples/templates/tool-risk-register.csv',
+    'examples/templates/data-interaction-matrix.csv',
+    'examples/checklists/customer-discovery.md'
   ]
 
   useEffect(() => {
@@ -50,6 +52,11 @@ export default function App() {
   }, [query, t.domains])
 
   const jump = id => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+
+  const openKnowledge = path => {
+    setKnowledgePath(path)
+    requestAnimationFrame(() => jump('knowledge'))
+  }
 
   return (
     <div className="page-shell">
@@ -85,16 +92,12 @@ export default function App() {
             <div className="hero-actions">
               <button className="primary" onClick={() => jump('architecture')}>{t.primaryCta} →</button>
               <button className="secondary" onClick={() => jump('training')}>{t.secondaryCta}</button>
-              <a
+              <button
                 className="secondary doc-link"
-                href={lang === 'it'
-                  ? 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/README.md'
-                  : 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/en/README.md'}
-                target="_blank"
-                rel="noreferrer"
+                onClick={() => openKnowledge(lang === 'it' ? 'docs/README.md' : 'docs/en/README.md')}
               >
-                Docs {lang.toUpperCase()} ↗
-              </a>
+                Docs {lang.toUpperCase()} ↓
+              </button>
             </div>
             <div className="hero-facts">
               <div><span>{t.status}</span><strong>{t.ga}</strong></div>
@@ -182,11 +185,11 @@ export default function App() {
           </div>
           <div className="asset-list">
             {t.examples.map(([title, text], i) => (
-              <a className="asset asset-link" href={resourceUrls[i]} target="_blank" rel="noreferrer" key={title}>
+              <button className="asset asset-link asset-button" onClick={() => openKnowledge(resourcePaths[i])} key={title}>
                 <span>{String(i + 1).padStart(2, '0')}</span>
                 <div><h3>{title}</h3><p>{text}</p></div>
-                <b>↗</b>
-              </a>
+                <b>↓</b>
+              </button>
             ))}
           </div>
         </section>
@@ -231,15 +234,15 @@ export default function App() {
             <p>{t.developerIntro}</p>
           </div>
           <div className="developer-flow">
-            {t.developerSteps.map(([code, title, text, cta, url]) => (
-              <a className="dev-step" href={url} target="_blank" rel="noreferrer" key={code}>
+            {t.developerSteps.map(([code, title, text, cta, path]) => (
+              <button className="dev-step dev-step-button" onClick={() => openKnowledge(path)} key={code}>
                 <span className="dev-code">{code}</span>
                 <div>
                   <h3>{title}</h3>
                   <p>{text}</p>
-                  <strong>{cta} ↗</strong>
+                  <strong>{cta} ↓</strong>
                 </div>
-              </a>
+              </button>
             ))}
           </div>
           <div className="developer-terminal">
@@ -249,9 +252,26 @@ export default function App() {
           </div>
         </section>
 
+        <section className="section knowledge" id="knowledge">
+          <div className="section-heading">
+            <p className="kicker">08 · KNOWLEDGE BASE</p>
+            <h2>{lang === 'it' ? 'Documentazione, direttamente nel sito.' : 'Documentation, directly in the site.'}</h2>
+            <p>
+              {lang === 'it'
+                ? 'Manuale, tutorial, query e sample vengono sincronizzati dalla repository a ogni build e renderizzati qui senza uscire su GitHub.'
+                : 'Manuals, tutorials, queries and samples are synchronized from the repository at build time and rendered here without leaving the site.'}
+            </p>
+          </div>
+          <MarkdownViewer
+            lang={lang}
+            requestedPath={knowledgePath}
+            onPathChange={setKnowledgePath}
+          />
+        </section>
+
         <section className="section sources" id="sources">
           <div className="section-heading">
-            <p className="kicker">08 · REFERENCES</p>
+            <p className="kicker">09 · REFERENCES</p>
             <h2>{t.sourcesTitle}</h2>
             <p>{t.sourcesIntro}</p>
           </div>
