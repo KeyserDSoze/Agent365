@@ -21,7 +21,7 @@ export const copy = {
     principle: 'Principio guida',
     principleText: 'Agent 365 è un control plane trasversale: non “vive dentro Defender”. Microsoft 365 admin center, Entra, Defender e Purview cooperano su piani diversi.',
     nav: {
-      overview: 'Overview', architecture: 'Architettura', domains: 'Domini', examples: 'Esempi', training: 'Training', labs: 'Lab', sources: 'Fonti'
+      overview: 'Overview', architecture: 'Architettura', domains: 'Domini', examples: 'Esempi', training: 'Training', labs: 'Lab', developer: 'Developer', sources: 'Fonti'
     },
     overviewTitle: 'La mappa mentale',
     overviewIntro: 'Per lavorare bene su Agent 365 bisogna distinguere il control plane dai runtime degli agenti. Il valore è portare inventory, identity, access, data protection, threat protection e observability dentro un modello operativo coerente.',
@@ -84,6 +84,14 @@ export const copy = {
       ['LAB 07', 'Custom agent onboarding', 'SDK/CLI, identity, observability e checklist di integrazione.'],
       ['CAPSTONE', 'Customer-ready POC', 'Assessment, architecture, controls, demo, runbook e roadmap.']
     ],
+    developerTitle: 'Developer path: dall’agente esistente ad Agent 365',
+    developerIntro: 'Un percorso concreto per registrare, instrumentare, validare e governare un agente custom senza riscriverne runtime o modello.',
+    developerSteps: [
+      ['01', 'Setup & Register', 'Installa Agent 365 Skills, verifica i prerequisiti, crea blueprint e agent identity.', 'Tutorial onboarding', 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/tutorials/01-onboard-existing-agent.md'],
+      ['02', 'Instrument', 'Aggiungi Microsoft OpenTelemetry Distro e valida prima localmente, poi verso Agent 365.', 'Observability tutorial', 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/tutorials/02-observability.md'],
+      ['03', 'Protect & Govern', 'Collega Defender hunting, Purview DLP e tool/MCP governance al flusso operativo.', 'Security tutorials', 'https://github.com/KeyserDSoze/Agent365/tree/main/docs/tutorials'],
+      ['04', 'Validate & Operate', 'Controlla root span, licensing, auth, evidence e troubleshooting prima del go-live.', 'Reference samples', 'https://github.com/KeyserDSoze/Agent365/tree/main/examples/reference-agent']
+    ],
     sourcesTitle: 'Source of truth',
     sourcesIntro: 'La knowledge base rimanda sempre alla documentazione Microsoft ufficiale. Le feature in Preview vanno ricontrollate prima di una decisione di produzione.',
     footer: 'Independent technical knowledge hub · Microsoft product names belong to their respective owners.'
@@ -100,7 +108,7 @@ export const copy = {
     principle: 'Guiding principle',
     principleText: 'Agent 365 is a cross-cutting control plane: it does not “live inside Defender”. Microsoft 365 admin center, Entra, Defender and Purview cooperate across distinct planes.',
     nav: {
-      overview: 'Overview', architecture: 'Architecture', domains: 'Domains', examples: 'Examples', training: 'Training', labs: 'Labs', sources: 'Sources'
+      overview: 'Overview', architecture: 'Architecture', domains: 'Domains', examples: 'Examples', training: 'Training', labs: 'Labs', developer: 'Developer', sources: 'Sources'
     },
     overviewTitle: 'The mental model',
     overviewIntro: 'To work effectively with Agent 365, separate the control plane from agent runtimes. The value is bringing inventory, identity, access, data protection, threat protection and observability into one operating model.',
@@ -162,6 +170,14 @@ export const copy = {
       ['LAB 06', 'MCP & tool governance', 'Tool catalog, risk rating and policy decision.'],
       ['LAB 07', 'Custom agent onboarding', 'SDK/CLI, identity, observability and integration checklist.'],
       ['CAPSTONE', 'Customer-ready POC', 'Assessment, architecture, controls, demo, runbook and roadmap.']
+    ],
+    developerTitle: 'Developer path: from an existing agent to Agent 365',
+    developerIntro: 'A practical path to register, instrument, validate and govern a custom agent without rebuilding its runtime or model.',
+    developerSteps: [
+      ['01', 'Setup & Register', 'Install Agent 365 Skills, validate prerequisites, create the blueprint and agent identity.', 'Onboarding tutorial', 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/en/tutorials/01-onboard-existing-agent.md'],
+      ['02', 'Instrument', 'Add Microsoft OpenTelemetry Distro and validate locally before Agent 365 export.', 'Observability tutorial', 'https://github.com/KeyserDSoze/Agent365/blob/main/docs/en/tutorials/02-observability.md'],
+      ['03', 'Protect & Govern', 'Connect Defender hunting, Purview DLP and tool/MCP governance to the operating flow.', 'Security tutorials', 'https://github.com/KeyserDSoze/Agent365/tree/main/docs/en/tutorials'],
+      ['04', 'Validate & Operate', 'Check root spans, licensing, auth, evidence and troubleshooting before go-live.', 'Reference samples', 'https://github.com/KeyserDSoze/Agent365/tree/main/examples/reference-agent']
     ],
     sourcesTitle: 'Source of truth',
     sourcesIntro: 'The knowledge base always points back to official Microsoft documentation. Preview features should be revalidated before production decisions.',

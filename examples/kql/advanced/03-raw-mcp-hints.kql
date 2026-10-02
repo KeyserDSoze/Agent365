@@ -1,0 +1,6 @@
+// Heuristic search in raw metadata.
+// Validate RawAgentInfo availability in your tenant.
+AgentsInfo
+| where tostring(RawAgentInfo) has_any ("MCP", "tool", "connector")
+| project Timestamp, AgentId, AgentName, Platform, RawAgentInfo
+| order by Timestamp desc

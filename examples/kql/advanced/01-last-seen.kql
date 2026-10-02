@@ -1,0 +1,4 @@
+// Last seen per agent
+AgentsInfo
+| summarize LastSeen=max(Timestamp) by AgentId, AgentName, Platform, AgentType
+| order by LastSeen desc

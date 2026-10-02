@@ -1,0 +1,11 @@
+{
+  "name": "agent365-reference-node",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --import @microsoft/opentelemetry/loader ./src/index.js"
+  },
+  "dependencies": {
+    "@microsoft/opentelemetry": "latest"
+  }
+}

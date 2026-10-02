@@ -1,0 +1,4 @@
+// Daily distinct-agent trend
+AgentsInfo
+| summarize Agents=dcount(AgentId) by bin(Timestamp, 1d)
+| order by Timestamp asc
