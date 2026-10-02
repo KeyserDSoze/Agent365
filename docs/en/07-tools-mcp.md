@@ -1,21 +1,113 @@
 # 07 — Tool & MCP Governance
 
 ## Principle
-An agent with tools can **act**, not just generate text. Tool governance is therefore part of the security design.
 
-## MCP
-Govern servers, authentication, exposed tools, input/output, privileges, network path, ownership, logging and versioning.
+An agent with tools can **act**, not only generate text. Risk is strongly determined by what a tool can touch and what it can do.
 
-## Tool Risk Register
-Capture tool, owner, platform/MCP server, auth, data access, operation, permissions, reversibility, impact, risk tier, monitoring and mitigation.
+Agent 365 brings agentic tools into the Microsoft 365 admin center with a dedicated registry, approval, block/unblock and observability capabilities. Granular control of individual tools inside supported MCP servers is rolling out and depends on server/tool-discovery support.
+
+## What counts as a tool
+
+The governance surface includes:
+- MCP servers;
+- connectors;
+- skills;
+- plugins;
+- custom function tools.
+
+Governing only MCP servers therefore leaves gaps.
+
+## Registry
+
+Collect at least:
+- name;
+- publisher/owner;
+- source/platform;
+- auth model;
+- data access;
+- operation;
+- permission scope;
+- reversibility;
+- external side effect;
+- business impact;
+- risk tier;
+- approval requirement;
+- enabled/blocked state;
+- monitoring;
+- revocation path.
 
 Template: `../../examples/templates/tool-risk-register.csv`.
 
-## Risk heuristic
-Increase review depth as write capability, privilege, sensitive data, irreversibility, third-party exposure and autonomy increase.
+## Block / unblock
 
-## Decision questions
-Human approval? Can it be read-only? Is scope constrained? How are credentials rotated? How is use logged? How is access revoked?
+A capability should be revocable quickly.
+
+Agent 365 can block tools/MCP servers centrally. Where supported, granular control can allow or block individual tools inside an MCP server.
+
+Custom-agent runtimes should also have an application-side enforcement path when immediate local revocation is required.
+
+## Human approval
+
+Increase review for:
+- write capability;
+- delete;
+- payments/transactions;
+- privileged operations;
+- sensitive data;
+- irreversibility;
+- third-party exposure;
+- autonomy.
+
+A robust approval should be:
+- tool-bound;
+- subject/conversation-bound;
+- time-limited;
+- one-shot;
+- audited.
+
+## Evidence
+
+Record at least:
+- tool;
+- operation;
+- risk tier;
+- allow/deny;
+- success/failure;
+- timestamp;
+- correlation key;
+- approval reference;
+- side-effect classification.
+
+Avoid automatically duplicating full prompts or sensitive tool arguments into the governance log.
+
+## Golden sample
+
+The golden sample implements:
+- in-process registry;
+- risk metadata;
+- runtime block/unblock;
+- one-time approval;
+- bounded audit;
+- conversation binding;
+- replay prevention.
+
+Tutorial: `tutorials/10-tool-governance-runtime.md`.
 
 ## Output
-Tool catalog + risk tier + approved/denied use cases + compensating controls + monitoring requirements.
+
+**Tool Risk Register + Policy Evidence**:
+- catalog;
+- risk tier;
+- approved/denied use case;
+- block state;
+- approval requirement;
+- compensating control;
+- monitoring requirement;
+- revocation path.
+
+## Sources
+
+- https://learn.microsoft.com/en-us/microsoft-365/admin/manage/manage-tools-for-agent?view=o365-worldwide
+- https://learn.microsoft.com/en-us/microsoft-agent-365/guidance/govern-tools
+- https://learn.microsoft.com/en-us/microsoft-365/admin/manage/manage-plugins-skills-mcp-servers?view=o365-worldwide
+- https://learn.microsoft.com/microsoft-agent-365/developer/tooling?tabs=nodejs
