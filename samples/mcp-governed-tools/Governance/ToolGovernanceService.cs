@@ -74,7 +74,7 @@ public sealed class ToolGovernanceService
             {
                 var normalized = policyCode.Trim().ToUpperInvariant();
 
-                return normalized switch
+                var summary = normalized switch
                 {
                     "AGENT-IDENTITY" =>
                         "Every production agent must have an explicit owner, a documented identity model, least-privilege permissions, and a tested revocation path.",
@@ -84,6 +84,12 @@ public sealed class ToolGovernanceService
                         "Every production agent must document data sources, classification, allowed operations, controls, and evidence.",
                     _ =>
                         "Unknown mock policy. Available examples: AGENT-IDENTITY, TOOL-GOVERNANCE, DATA-GOVERNANCE."
+                };
+
+                return new
+                {
+                    policyCode = normalized,
+                    summary
                 };
             });
 
