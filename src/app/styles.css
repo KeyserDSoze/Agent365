@@ -107,6 +107,7 @@ main { overflow: hidden; }
 .primary, .secondary {
   border-radius: 11px; padding: 13px 18px; cursor:pointer; border: 1px solid transparent; font-weight:700; font-size: 13px;
 }
+.doc-link { text-decoration:none; display:inline-flex; align-items:center; }
 .primary { color:white; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow:0 12px 28px rgba(94,92,235,.22); }
 .secondary { background:var(--bg-soft); border-color:var(--line); }
 .hero-facts { margin-top: 38px; display:grid; gap:14px; }
@@ -175,6 +176,8 @@ main { overflow: hidden; }
 
 .asset-list { border-top:1px solid var(--line); }
 .asset { display:grid; grid-template-columns:50px 1fr 25px; gap:16px; align-items:center; padding:18px 4px; border-bottom:1px solid var(--line); }
+.asset-link { text-decoration:none; }
+.asset-link:hover h3 { color:var(--accent); }
 .asset > span { color:var(--muted-2); font:700 10px ui-monospace,monospace; }
 .asset h3 { margin:0 0 5px; font-size:15px; }
 .asset p { margin:0; color:var(--muted); font-size:12px; }
