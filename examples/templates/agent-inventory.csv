@@ -1,0 +1,2 @@
+AgentName,AgentId,Platform,AgentType,Environment,Owner,Sponsor,IdentityType,Audience,DataSources,ToolsOrMCP,Permissions,RiskTier,LifecycleState,Telemetry,LastReview,Notes
+ExampleAgent,,Copilot Studio,Interactive,Test,owner@example.com,,User-delegated,Internal,SharePoint,ReadOnlySearch,Read,Medium,Active,Enabled,,Replace with real data

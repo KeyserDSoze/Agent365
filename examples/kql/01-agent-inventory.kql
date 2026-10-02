@@ -1,0 +1,4 @@
+// Verify current AgentsInfo schema in your tenant.
+AgentsInfo
+| project Timestamp, AgentName, AgentId, AgentType, Platform, Status
+| order by Timestamp desc

@@ -1,0 +1,2 @@
+ToolName,Owner,PlatformOrMCPServer,AuthModel,DataAccess,Operation,Permissions,Reversible,BusinessImpact,RiskTier,Monitoring,ApprovedUseCase,Mitigation,ReviewDate
+ExampleTool,owner@example.com,Internal MCP,OAuth,CRM,Write,Scoped,Yes,Medium,Medium,Audit,Create draft record,Human approval before commit,

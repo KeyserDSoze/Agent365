@@ -1,0 +1,3 @@
+AgentsInfo
+| summarize Agents=count() by Platform
+| order by Agents desc
