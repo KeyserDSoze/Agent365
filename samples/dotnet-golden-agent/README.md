@@ -3,7 +3,7 @@
 A runnable reference implementation that shows how to layer:
 
 - **Microsoft Agent Framework** — agent runtime, sessions and function tools;
-- **Azure OpenAI Responses API** — model provider;
+- **Azure OpenAI Chat Completions** — stable model-provider path for the baseline sample;
 - **Microsoft OpenTelemetry Distro** — local and Agent 365 telemetry;
 - **Agent 365 observability S2S** — optional custom-engine export;
 - **ASP.NET Core** — a small HTTP surface for local/container tests.
@@ -38,7 +38,7 @@ Microsoft OpenTelemetry Distro
 ## Prerequisites
 
 - .NET 8 SDK
-- Azure OpenAI resource with a deployed model supported by the Responses API
+- Azure OpenAI resource with a deployed chat model
 - `az login` for local Azure OpenAI authentication
 - for Agent 365 export: a **standard Entra app registration** with application permission `Agent365.Observability.OtelWrite` and admin consent
 
@@ -173,3 +173,8 @@ The image can start without Azure OpenAI configuration; `/health` and `/api/conf
 
 - Observability authentication setup  
   https://learn.microsoft.com/en-us/microsoft-agent-365/developer/observability-authentication-setup
+
+
+## Why the baseline uses Chat Completions
+
+Microsoft Agent Framework supports both Azure OpenAI Responses and Chat Completions. Responses is the richer recommended API for hosted tools, but the current .NET Responses surface still carries evaluation/prerelease diagnostics in the Azure/OpenAI client stack. The golden baseline intentionally uses the stable Chat Completions path so the reference project builds cleanly with warnings-as-errors. A separate Responses variant can be added without changing the Agent 365 architecture.
