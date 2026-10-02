@@ -3,8 +3,15 @@
 ### Health
 GET {{host}}/health
 
+### Readiness: model provider configured and reachable
+GET {{host}}/ready
+
 ### Safe config
 GET {{host}}/api/config
+
+### Operational diagnostics
+GET {{host}}/api/diagnostics
+# X-Api-Key: replace-if-enabled
 
 ### First turn
 POST {{host}}/api/chat
