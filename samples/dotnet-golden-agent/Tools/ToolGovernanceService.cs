@@ -115,13 +115,30 @@ public sealed class ToolGovernanceService
             Denied: records.Count(x => x.Decision == "denied"));
     }
 
-    public IReadOnlyList<ToolAuditRecord> GetAudit(int limit = 50)
+    public IReadOnlyList<ToolAuditRecord> GetAudit(
+        int limit = 50,
+        string? runId = null,
+        string? conversationId = null)
     {
         var bounded = Math.Clamp(limit, 1, Math.Min(_options.AuditCapacity, 500));
-        return _audit
-            .Reverse()
-            .Take(bounded)
-            .ToArray();
+        IEnumerable<ToolAuditRecord> query = _audit.Reverse();
+
+        if (!string.IsNullOrWhiteSpace(runId))
+        {
+            query = query.Where(x =>
+                string.Equals(x.RunId, runId, StringComparison.Ordinal));
+        }
+
+        if (!string.IsNullOrWhiteSpace(conversationId))
+        {
+            query = query.Where(x =>
+                string.Equals(
+                    x.ConversationId,
+                    conversationId,
+                    StringComparison.Ordinal));
+        }
+
+        return query.Take(bounded).ToArray();
     }
 
     public ToolExecutionResult LookupPolicy(string policyCode)
