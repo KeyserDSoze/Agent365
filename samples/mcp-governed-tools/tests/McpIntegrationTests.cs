@@ -1,4 +1,5 @@
 using Agent365.GovernedMcpServer.Governance;
+using Microsoft.Extensions.AI;
 using ModelContextProtocol.Client;
 using Xunit;
 
@@ -86,11 +87,13 @@ public sealed class McpIntegrationTests
         var lookup = tools.Single(
             tool => tool.Name == ToolGovernanceService.PolicyLookupTool);
 
+        var arguments = new AIFunctionArguments
+        {
+            ["policyCode"] = "AGENT-IDENTITY"
+        };
+
         var result = await lookup.InvokeAsync(
-            new Dictionary<string, object?>
-            {
-                ["policyCode"] = "AGENT-IDENTITY"
-            },
+            arguments,
             cancellationToken: timeout.Token);
 
         var text = result.ToString();
