@@ -46,5 +46,9 @@ Registry, risk tiers, block/unblock, one-time approval and bounded audit.
 Run IDs, trace IDs, privacy-safe evidence, tool-audit correlation and operational summary.  
 **Output:** evidence snapshot + correlation proof.
 
+## LAB 12 — Operations Dashboard
+Evidence export, KPIs, filters, run drill-down and tool-decision correlation.  
+**Output:** operations export JSON + dashboard walkthrough.
+
 ## CAPSTONE
 Current-state assessment, baseline, architecture, risk, identity, security/data controls, operating model, POC charter, 30/60/90 and a 20-minute demo.

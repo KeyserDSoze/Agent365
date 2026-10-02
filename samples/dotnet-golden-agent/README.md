@@ -375,6 +375,34 @@ See:
 - `docs/tutorials/11-run-evidence-observability.md`
 - `docs/en/tutorials/11-run-evidence-observability.md`
 
+## Portable operations export
+
+The golden agent can emit a portable metadata-only bundle for the static Operations Dashboard:
+
+```text
+GET /api/evidence/export?limit=200
+```
+
+Schema:
+
+```text
+agent365-golden-agent-evidence/v1
+```
+
+The bundle contains run evidence, tool audit, the tool registry and summary metrics, with `capturesContent=false`.
+
+Save it locally and load it into the **Operations** section of the GitHub Pages site. Parsing happens in the browser; the static site does not require a backend upload flow.
+
+Bundled demo:
+
+```text
+examples/evidence/operations-sample.json
+```
+
+Tutorial:
+- `docs/tutorials/12-operations-dashboard.md`
+- `docs/en/tutorials/12-operations-dashboard.md`
+
 ## Docker
 
 Build and boot:

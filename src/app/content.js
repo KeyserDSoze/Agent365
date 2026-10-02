@@ -21,7 +21,7 @@ export const copy = {
     principle: 'Principio guida',
     principleText: 'Agent 365 è un control plane trasversale: non “vive dentro Defender”. Microsoft 365 admin center, Entra, Defender e Purview cooperano su piani diversi.',
     nav: {
-      overview: 'Overview', architecture: 'Architettura', domains: 'Domini', examples: 'Esempi', training: 'Training', labs: 'Lab', developer: 'Developer', knowledge: 'Knowledge', sources: 'Fonti'
+      overview: 'Overview', architecture: 'Architettura', domains: 'Domini', examples: 'Esempi', training: 'Training', labs: 'Lab', developer: 'Developer', operations: 'Operations', knowledge: 'Knowledge', sources: 'Fonti'
     },
     overviewTitle: 'La mappa mentale',
     overviewIntro: 'Per lavorare bene su Agent 365 bisogna distinguere il control plane dai runtime degli agenti. Il valore è portare inventory, identity, access, data protection, threat protection e observability dentro un modello operativo coerente.',
@@ -86,6 +86,7 @@ export const copy = {
       ['LAB 09', 'Operational hardening', 'Readiness, access key opzionale, rate limit e limiti di sessione/input.'],
       ['LAB 10', 'Tool governance runtime', 'Registry, risk tier, block/unblock, approval one-shot e audit allow/deny.'],
       ['LAB 11', 'Run evidence & correlation', 'Run ID, trace ID, evidence metadata-only e correlation con il tool audit.'],
+      ['LAB 12', 'Operations dashboard', 'Evidence export, KPI, filtri, run drill-down e tool decision correlation.'],
       ['CAPSTONE', 'Customer-ready POC', 'Assessment, architecture, controls, demo, runbook e roadmap.']
     ],
     developerTitle: 'Developer path: dall’agente esistente ad Agent 365',
@@ -100,7 +101,8 @@ export const copy = {
       ['07', 'Prove it', 'Esegui inference diretta, due turni Agent Framework e salva l’evidenza del lab.', 'Local lab runner', 'docs/tutorials/08-local-lab-runner.md'],
       ['08', 'Harden the POC', 'Aggiungi readiness, access key opzionale, rate limit e limiti di sessione/input.', 'Hardening tutorial', 'docs/tutorials/09-golden-agent-hardening.md'],
       ['09', 'Govern tools', 'Classifica i tool, blocca capability, richiedi approval e conserva evidence di allow/deny.', 'Tool governance', 'docs/tutorials/10-tool-governance-runtime.md'],
-      ['10', 'Correlate evidence', 'Collega run ID, trace ID, conversation e decisioni tool senza salvare prompt o risposte.', 'Evidence & observability', 'docs/tutorials/11-run-evidence-observability.md']
+      ['10', 'Correlate evidence', 'Collega run ID, trace ID, conversation e decisioni tool senza salvare prompt o risposte.', 'Evidence & observability', 'docs/tutorials/11-run-evidence-observability.md'],
+      ['11', 'Operate', 'Esporta evidence e analizza KPI, latency, failure e tool decision nella dashboard del sito.', 'Operations dashboard', 'docs/tutorials/12-operations-dashboard.md']
     ],
     sourcesTitle: 'Source of truth',
     sourcesIntro: 'La knowledge base rimanda sempre alla documentazione Microsoft ufficiale. Le feature in Preview vanno ricontrollate prima di una decisione di produzione.',
@@ -118,7 +120,7 @@ export const copy = {
     principle: 'Guiding principle',
     principleText: 'Agent 365 is a cross-cutting control plane: it does not “live inside Defender”. Microsoft 365 admin center, Entra, Defender and Purview cooperate across distinct planes.',
     nav: {
-      overview: 'Overview', architecture: 'Architecture', domains: 'Domains', examples: 'Examples', training: 'Training', labs: 'Labs', developer: 'Developer', knowledge: 'Knowledge', sources: 'Sources'
+      overview: 'Overview', architecture: 'Architecture', domains: 'Domains', examples: 'Examples', training: 'Training', labs: 'Labs', developer: 'Developer', operations: 'Operations', knowledge: 'Knowledge', sources: 'Sources'
     },
     overviewTitle: 'The mental model',
     overviewIntro: 'To work effectively with Agent 365, separate the control plane from agent runtimes. The value is bringing inventory, identity, access, data protection, threat protection and observability into one operating model.',
@@ -183,6 +185,7 @@ export const copy = {
       ['LAB 09', 'Operational hardening', 'Readiness, optional access key, rate limits and input/session guardrails.'],
       ['LAB 10', 'Tool governance runtime', 'Registry, risk tiers, block/unblock, one-time approval and allow/deny audit.'],
       ['LAB 11', 'Run evidence & correlation', 'Run IDs, trace IDs, metadata-only evidence and tool-audit correlation.'],
+      ['LAB 12', 'Operations dashboard', 'Evidence export, KPIs, filters, run drill-down and tool-decision correlation.'],
       ['CAPSTONE', 'Customer-ready POC', 'Assessment, architecture, controls, demo, runbook and roadmap.']
     ],
     developerTitle: 'Developer path: from an existing agent to Agent 365',
@@ -197,7 +200,8 @@ export const copy = {
       ['07', 'Prove it', 'Run direct inference, two Agent Framework turns and retain lab evidence.', 'Local lab runner', 'docs/en/tutorials/08-local-lab-runner.md'],
       ['08', 'Harden the POC', 'Add readiness, optional access-key protection, rate limits and input/session guardrails.', 'Hardening tutorial', 'docs/en/tutorials/09-golden-agent-hardening.md'],
       ['09', 'Govern tools', 'Classify tools, revoke capabilities, require approval and retain allow/deny evidence.', 'Tool governance', 'docs/en/tutorials/10-tool-governance-runtime.md'],
-      ['10', 'Correlate evidence', 'Link run IDs, trace IDs, conversations and tool decisions without storing prompt/response content.', 'Evidence & observability', 'docs/en/tutorials/11-run-evidence-observability.md']
+      ['10', 'Correlate evidence', 'Link run IDs, trace IDs, conversations and tool decisions without storing prompt/response content.', 'Evidence & observability', 'docs/en/tutorials/11-run-evidence-observability.md'],
+      ['11', 'Operate', 'Export evidence and inspect KPIs, latency, failures and tool decisions in the site dashboard.', 'Operations dashboard', 'docs/en/tutorials/12-operations-dashboard.md']
     ],
     sourcesTitle: 'Source of truth',
     sourcesIntro: 'The knowledge base always points back to official Microsoft documentation. Preview features should be revalidated before production decisions.',

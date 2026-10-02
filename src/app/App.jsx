@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { copy, officialLinks } from './content.js'
 import MarkdownViewer from './MarkdownViewer.jsx'
+import OperationsDashboard from './OperationsDashboard.jsx'
 
 function Icon({ children }) {
   return <span className="icon" aria-hidden="true">{children}</span>
@@ -318,9 +319,22 @@ export default function App() {
           </div>
         </section>
 
+        <section className="section operations" id="operations">
+          <div className="section-heading">
+            <p className="kicker">08 · OPERATIONS</p>
+            <h2>{lang === 'it' ? 'Dal run alla evidence, senza uscire dal browser.' : 'From run to evidence, directly in the browser.'}</h2>
+            <p>
+              {lang === 'it'
+                ? 'Una vista operativa del golden agent: KPI, latency, failure, correlation e decisioni tool. Usa il sample incluso oppure carica un export JSON reale generato dal lab.'
+                : 'An operational view of the golden agent: KPIs, latency, failures, correlation and tool decisions. Use the bundled sample or load a real JSON export from the lab.'}
+            </p>
+          </div>
+          <OperationsDashboard lang={lang} />
+        </section>
+
         <section className="section knowledge" id="knowledge">
           <div className="section-heading">
-            <p className="kicker">08 · KNOWLEDGE BASE</p>
+            <p className="kicker">09 · KNOWLEDGE BASE</p>
             <h2>{lang === 'it' ? 'Documentazione, direttamente nel sito.' : 'Documentation, directly in the site.'}</h2>
             <p>
               {lang === 'it'
@@ -337,7 +351,7 @@ export default function App() {
 
         <section className="section sources" id="sources">
           <div className="section-heading">
-            <p className="kicker">09 · REFERENCES</p>
+            <p className="kicker">10 · REFERENCES</p>
             <h2>{t.sourcesTitle}</h2>
             <p>{t.sourcesIntro}</p>
           </div>

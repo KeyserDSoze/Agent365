@@ -77,3 +77,7 @@ GET {{host}}/api/evidence/summary
 ### Run evidence for one conversation
 GET {{host}}/api/evidence/runs?conversationId=replace-with-conversation-id&limit=20
 # X-Api-Key: replace-if-enabled
+
+### Portable operations evidence export
+GET {{host}}/api/evidence/export?limit=200
+# X-Api-Key: replace-if-enabled

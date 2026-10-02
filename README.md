@@ -74,3 +74,21 @@ Start from:
 ## Editorial rule
 
 This repository accelerates technical readiness; it does not replace Microsoft documentation. Revalidate Preview features, licensing, roles, model capabilities, SDK/CLI behavior and service limitations before production decisions.
+
+
+## Operations dashboard
+
+The GitHub Pages site includes an **Operations** section that renders privacy-safe run evidence from the golden agent.
+
+It can:
+- load the bundled sample under `examples/evidence/operations-sample.json`;
+- import a real `agent365-golden-agent-evidence/v1` JSON bundle locally in the browser;
+- show run KPIs, success/failure, latency, provider/model, trace correlation and tool allow/deny decisions.
+
+The Windows local lab runner automatically writes:
+
+```text
+samples/dotnet-golden-agent/lab-output/operations-export.json
+```
+
+That file can be loaded directly into the dashboard.

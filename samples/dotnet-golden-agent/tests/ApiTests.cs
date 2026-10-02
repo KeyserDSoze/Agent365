@@ -179,6 +179,20 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
+    public async Task EvidenceExport_HasPortablePrivacySafeContract()
+    {
+        using var client = _factory.CreateClient();
+
+        var json = await client.GetStringAsync("/api/evidence/export?limit=20");
+
+        Assert.True(json.Contains("agent365-golden-agent-evidence/v1", StringComparison.Ordinal));
+        Assert.True(json.Contains("\"capturesContent\":false", StringComparison.OrdinalIgnoreCase));
+        Assert.True(json.Contains("\"runs\"", StringComparison.OrdinalIgnoreCase));
+        Assert.True(json.Contains("\"toolAudit\"", StringComparison.OrdinalIgnoreCase));
+        Assert.True(json.Contains("\"tools\"", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
     public async Task Chat_RejectsOversizedMessages()
     {
         using var factory = _factory.WithWebHostBuilder(builder =>

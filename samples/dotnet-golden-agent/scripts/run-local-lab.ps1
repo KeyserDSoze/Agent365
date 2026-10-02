@@ -70,6 +70,7 @@ $report = [ordered]@{
     foundryEndpoint = $null
     checks = [ordered]@{}
     responses = [ordered]@{}
+    outputs = [ordered]@{}
     success = $false
 }
 
@@ -212,11 +213,33 @@ try {
         throw "Run evidence unexpectedly reports content capture."
     }
 
-    $report.success = $true
-
     Write-Host "Evidence correlated run IDs:"
     Write-Host "  first:  $($first.runId)"
     Write-Host "  second: $($second.runId)"
+
+    Write-Host ""
+    Write-Host "=== 7. Export Operations Dashboard bundle ==="
+
+    $operationsExport = Invoke-RestMethod -Uri "$agentUrl/api/evidence/export?limit=200" -Method Get
+
+    if ($operationsExport.schema -ne "agent365-golden-agent-evidence/v1") {
+        throw "Unexpected operations evidence schema: $($operationsExport.schema)"
+    }
+
+    if ($operationsExport.capturesContent -ne $false) {
+        throw "Operations export unexpectedly reports content capture."
+    }
+
+    $operationsExportPath = Join-Path $outputDir "operations-export.json"
+    $operationsExport |
+        ConvertTo-Json -Depth 20 |
+        Set-Content -Path $operationsExportPath -Encoding UTF8
+
+    $report.outputs.operationsExport = $operationsExportPath
+    $report.checks.operationsExport = Test-Path $operationsExportPath
+    $report.success = $true
+
+    Write-Host "Dashboard bundle: $operationsExportPath"
     Write-Host ""
     Write-Host "LOCAL LAB: PASS"
 }
