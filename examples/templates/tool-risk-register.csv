@@ -1,2 +1,2 @@
-ToolName,Owner,PlatformOrMCPServer,AuthModel,DataAccess,Operation,Permissions,Reversible,BusinessImpact,RiskTier,Monitoring,ApprovedUseCase,Mitigation,ReviewDate
-ExampleTool,owner@example.com,Internal MCP,OAuth,CRM,Write,Scoped,Yes,Medium,Medium,Audit,Create draft record,Human approval before commit,
+ToolName,Owner,PlatformOrMCPServer,Publisher,AuthModel,DataAccess,Operation,Permissions,Reversible,ExternalSideEffect,BusinessImpact,RiskTier,ApprovalRequired,EnabledState,Monitoring,ApprovedUseCase,Mitigation,RevocationPath,ReviewDate
+ExampleTool,owner@example.com,Internal MCP,Internal,OAuth,CRM,Write,Scoped,Yes,Yes,Medium,Medium,Yes,Enabled,Audit,Create draft record,Human approval before commit,Block tool and revoke credential,
