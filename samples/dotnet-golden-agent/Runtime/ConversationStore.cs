@@ -5,22 +5,41 @@ namespace Agent365.GoldenAgent.Runtime;
 
 public sealed class ConversationStore
 {
-    private readonly ConcurrentDictionary<string, Lazy<Task<AgentSession>>> _sessions = new();
+    private readonly ConcurrentDictionary<string, ConversationState> _conversations = new();
 
-    public Task<AgentSession> GetOrCreateAsync(
+    public async Task<string> RunAsync(
         string conversationId,
+        string message,
         AgentRuntime runtime,
         CancellationToken cancellationToken)
     {
-        var lazy = _sessions.GetOrAdd(
+        var state = _conversations.GetOrAdd(
             conversationId,
-            _ => new Lazy<Task<AgentSession>>(
-                () => runtime.CreateSessionAsync(cancellationToken),
-                LazyThreadSafetyMode.ExecutionAndPublication));
+            static _ => new ConversationState());
 
-        return lazy.Value;
+        await state.Gate.WaitAsync(cancellationToken);
+
+        try
+        {
+            state.Session ??= await runtime.CreateSessionAsync(cancellationToken);
+
+            return await runtime.RunAsync(
+                message,
+                state.Session,
+                cancellationToken);
+        }
+        finally
+        {
+            state.Gate.Release();
+        }
     }
 
     public bool Remove(string conversationId) =>
-        _sessions.TryRemove(conversationId, out _);
+        _conversations.TryRemove(conversationId, out _);
+
+    private sealed class ConversationState
+    {
+        public SemaphoreSlim Gate { get; } = new(1, 1);
+        public AgentSession? Session { get; set; }
+    }
 }
