@@ -11,6 +11,7 @@ Questa sezione porta la knowledge base dal piano teorico all'esecuzione.
 5. [Troubleshooting playbook](05-troubleshooting.md)
 6. [Golden Agent .NET end-to-end](06-dotnet-golden-agent.md)
 7. [Foundry Local come model runtime](07-foundry-local.md)
+8. [Local Lab Runner end-to-end](08-local-lab-runner.md)
 
 ## Regola
 
