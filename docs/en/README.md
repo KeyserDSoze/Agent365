@@ -22,7 +22,7 @@ This folder mirrors the formal Agent 365 study material in English.
 | 12 | [Labs](12-labs.md) | Hands-on practice |
 | 13 | [Customer Delivery](13-customer-delivery.md) | Assessment, POC and roadmap |
 | 14 | [Official Sources](14-sources.md) | Microsoft source of truth |
-| 15 | [Connected Platforms](15-connected-platforms.md) | Third-party platform synchronization |
+| 15 | [Connected Platforms](15-connected-platforms.md) | Third-party platform synchronization |\n| 16 | [Local Model Runtime](16-local-model-runtime.md) | Foundry Local, on-device LLMs and provider boundary |
 
 ## Method
 
