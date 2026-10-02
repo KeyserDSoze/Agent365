@@ -176,6 +176,7 @@ export const copy = {
       ['LAB 06', 'MCP & tool governance', 'Tool catalog, risk rating and policy decision.'],
       ['LAB 07', 'Custom agent onboarding', 'SDK/CLI, identity, observability and integration checklist.'],
       ['LAB 08', 'Local golden-agent runner', 'Foundry Local, real inference, multi-turn validation and a JSON evidence report.'],
+      ['LAB 09', 'Operational hardening', 'Readiness, optional access key, rate limits and input/session guardrails.'],
       ['CAPSTONE', 'Customer-ready POC', 'Assessment, architecture, controls, demo, runbook and roadmap.']
     ],
     developerTitle: 'Developer path: from an existing agent to Agent 365',
@@ -187,7 +188,8 @@ export const copy = {
       ['04', 'Validate & Operate', 'Check root spans, licensing, auth, evidence and troubleshooting before go-live.', 'Reference samples', 'examples/reference-agent/README.md'],
       ['05', 'Run the Golden Agent', 'Run the real .NET sample with API hosting, sessions, tools, Docker and optional S2S observability.', 'Golden Agent .NET', 'samples/dotnet-golden-agent/README.md'],
       ['06', 'Local LLM', 'Start Foundry Local, download a hardware-appropriate model and use the local OpenAI-compatible endpoint.', 'Foundry Local', 'docs/en/tutorials/07-foundry-local.md'],
-      ['07', 'Prove it', 'Run direct inference, two Agent Framework turns and retain lab evidence.', 'Local lab runner', 'docs/en/tutorials/08-local-lab-runner.md']
+      ['07', 'Prove it', 'Run direct inference, two Agent Framework turns and retain lab evidence.', 'Local lab runner', 'docs/en/tutorials/08-local-lab-runner.md'],
+      ['08', 'Harden the POC', 'Add readiness, optional access-key protection, rate limits and input/session guardrails.', 'Hardening tutorial', 'docs/en/tutorials/09-golden-agent-hardening.md']
     ],
     sourcesTitle: 'Source of truth',
     sourcesIntro: 'The knowledge base always points back to official Microsoft documentation. Preview features should be revalidated before production decisions.',
