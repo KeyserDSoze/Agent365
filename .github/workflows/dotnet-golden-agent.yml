@@ -1,0 +1,41 @@
+name: Validate .NET Golden Agent
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - "samples/dotnet-golden-agent/**"
+      - ".github/workflows/dotnet-golden-agent.yml"
+  push:
+    branches: ["main"]
+    paths:
+      - "samples/dotnet-golden-agent/**"
+      - ".github/workflows/dotnet-golden-agent.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        working-directory: samples/dotnet-golden-agent
+        run: dotnet restore
+
+      - name: Build
+        working-directory: samples/dotnet-golden-agent
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish
+        working-directory: samples/dotnet-golden-agent
+        run: dotnet publish --configuration Release --no-build --output ./publish

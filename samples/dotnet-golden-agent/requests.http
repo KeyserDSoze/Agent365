@@ -1,0 +1,27 @@
+@host = http://localhost:8080
+
+### Health
+GET {{host}}/health
+
+### Safe config
+GET {{host}}/api/config
+
+### First turn
+POST {{host}}/api/chat
+Content-Type: application/json
+
+{
+  "message": "What does policy AGENT-IDENTITY require?"
+}
+
+### Continue a conversation
+POST {{host}}/api/chat
+Content-Type: application/json
+
+{
+  "conversationId": "replace-with-id-from-first-response",
+  "message": "Create a mock draft change request to align an agent to that policy."
+}
+
+### Forget in-memory conversation
+DELETE {{host}}/api/conversations/replace-with-id-from-first-response

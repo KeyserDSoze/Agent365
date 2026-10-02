@@ -1,0 +1,14 @@
+services:
+  golden-agent:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      Agent__AzureOpenAIEndpoint: ${Agent__AzureOpenAIEndpoint:-}
+      Agent__Model: ${Agent__Model:-gpt-4o-mini}
+      Agent365__ExportToConsole: "true"
+      Agent365__ExportToAgent365: ${Agent365__ExportToAgent365:-false}
+      Agent365__AgentId: ${Agent365__AgentId:-}
+      Agent365__TenantId: ${Agent365__TenantId:-}
+      Agent365__ClientSecret: ${Agent365__ClientSecret:-}
+      A365_OBSERVABILITY_LOG_LEVEL: ${A365_OBSERVABILITY_LOG_LEVEL:-info}
