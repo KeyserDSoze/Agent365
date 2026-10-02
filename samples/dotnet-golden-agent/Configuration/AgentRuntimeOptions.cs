@@ -5,8 +5,16 @@ public sealed class AgentRuntimeOptions
     public const string SectionName = "Agent";
 
     public string Name { get; set; } = "AGIC-Agent365-GoldenAgent";
-    public string Model { get; set; } = "gpt-4o-mini";
+
+    // foundry-local | azure-openai
+    public string Provider { get; set; } = "foundry-local";
+
+    // Foundry Local bootstrap resolves the alias to the concrete model ID and sets this value.
+    public string Model { get; set; } = string.Empty;
+
+    public string FoundryLocalEndpoint { get; set; } = "http://127.0.0.1:39839/v1";
     public string AzureOpenAIEndpoint { get; set; } = string.Empty;
+
     public string Instructions { get; set; } =
         """
         You are the AGIC Agent 365 golden sample.
