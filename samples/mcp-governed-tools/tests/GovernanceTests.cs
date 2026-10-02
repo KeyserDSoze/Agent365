@@ -24,11 +24,11 @@ public sealed class GovernanceTests
             json,
             StringComparison.Ordinal);
         Assert.Contains(
-            ""riskTier"",
+            "\\\"riskTier\\\"",
             json,
             StringComparison.OrdinalIgnoreCase);
         Assert.Contains(
-            ""approvalTokenExposed": false",
+            "\\\"approvalTokenExposed\\\": false",
             json,
             StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(
@@ -56,7 +56,7 @@ public sealed class GovernanceTests
 
         var audit = service.GetAuditSummaryJson();
         Assert.Contains(
-            ""allowed": 1",
+            "\\\"allowed\\\": 1",
             audit,
             StringComparison.OrdinalIgnoreCase);
     }
@@ -160,7 +160,7 @@ public sealed class GovernanceTests
         var json = service.GetAuditSummaryJson();
 
         Assert.Contains(
-            ""bufferedEvents": 10",
+            "\\\"bufferedEvents\\\": 10",
             json,
             StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain(
@@ -168,7 +168,7 @@ public sealed class GovernanceTests
             json,
             StringComparison.Ordinal);
         Assert.Contains(
-            ""capturesArguments": false",
+            "\\\"capturesArguments\\\": false",
             json,
             StringComparison.OrdinalIgnoreCase);
     }
