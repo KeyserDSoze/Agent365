@@ -30,5 +30,9 @@ Catalogo, read/write, auth, reversibility, risk, mitigation.
 SDK/CLI prereq, identity, telemetry, CI/CD, validation.  
 **Output:** onboarding runbook.
 
+## LAB 08 — Local Golden Agent
+Foundry Local, inference diretta, Agent Framework API e sessione multi-turn.  
+**Output:** report JSON del local lab runner + log runtime.
+
 ## CAPSTONE
 Current-state assessment, baseline, architecture, risk, identity, security/data control, operating model, POC charter, 30/60/90, demo 20 minuti.
