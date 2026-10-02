@@ -15,22 +15,32 @@ public sealed class GovernanceTests
 
         var json = service.GetManifestJson();
 
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+
+        Assert.Equal(
+            "agic-agent365-mcp-governance/v1",
+            root.GetProperty("schema").GetString());
+        Assert.False(
+            root.GetProperty("approvalTokenExposed").GetBoolean());
+
+        var tools = root.GetProperty("tools").EnumerateArray().ToArray();
+
         Assert.Contains(
-            ToolGovernanceService.PolicyLookupTool,
-            json,
-            StringComparison.Ordinal);
+            tools,
+            tool =>
+                tool.GetProperty("name").GetString() ==
+                    ToolGovernanceService.PolicyLookupTool &&
+                tool.GetProperty("riskTier").GetString() == "Low");
+
         Assert.Contains(
-            ToolGovernanceService.DraftChangeRequestTool,
-            json,
-            StringComparison.Ordinal);
-        Assert.Contains(
-            "\\\"riskTier\\\"",
-            json,
-            StringComparison.OrdinalIgnoreCase);
-        Assert.Contains(
-            "\\\"approvalTokenExposed\\\": false",
-            json,
-            StringComparison.OrdinalIgnoreCase);
+            tools,
+            tool =>
+                tool.GetProperty("name").GetString() ==
+                    ToolGovernanceService.DraftChangeRequestTool &&
+                tool.GetProperty("riskTier").GetString() == "Medium" &&
+                tool.GetProperty("requiresApproval").GetBoolean());
+
         Assert.DoesNotContain(
             "top-secret-approval",
             json,
@@ -54,11 +64,13 @@ public sealed class GovernanceTests
         Assert.False(
             root.GetProperty("externalSideEffect").GetBoolean());
 
-        var audit = service.GetAuditSummaryJson();
-        Assert.Contains(
-            "\\\"allowed\\\": 1",
-            audit,
-            StringComparison.OrdinalIgnoreCase);
+        using var auditDocument = JsonDocument.Parse(
+            service.GetAuditSummaryJson());
+
+        var summary = auditDocument.RootElement.GetProperty("summary");
+
+        Assert.Equal(1, summary.GetProperty("allowed").GetInt32());
+        Assert.Equal(0, summary.GetProperty("denied").GetInt32());
     }
 
     [Fact]
@@ -159,18 +171,20 @@ public sealed class GovernanceTests
 
         var json = service.GetAuditSummaryJson();
 
-        Assert.Contains(
-            "\\\"bufferedEvents\\\": 10",
-            json,
-            StringComparison.OrdinalIgnoreCase);
+        using var document = JsonDocument.Parse(json);
+        var root = document.RootElement;
+
+        Assert.False(root.GetProperty("capturesArguments").GetBoolean());
+        Assert.Equal(
+            10,
+            root.GetProperty("summary")
+                .GetProperty("bufferedEvents")
+                .GetInt32());
+
         Assert.DoesNotContain(
             "SECRET-ARGUMENT",
             json,
             StringComparison.Ordinal);
-        Assert.Contains(
-            "\\\"capturesArguments\\\": false",
-            json,
-            StringComparison.OrdinalIgnoreCase);
     }
 
     private static ToolGovernanceService CreateService(
