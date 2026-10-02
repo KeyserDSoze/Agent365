@@ -57,6 +57,10 @@ jobs:
         working-directory: samples/dotnet-golden-agent
         run: dotnet build --configuration Release --no-restore
 
+      - name: HTTP guardrail tests
+        working-directory: samples/dotnet-golden-agent
+        run: dotnet test ./tests/Agent365.GoldenAgent.Tests.csproj --configuration Release
+
       - name: Publish
         working-directory: samples/dotnet-golden-agent
         run: dotnet publish --configuration Release --no-build --output ./publish

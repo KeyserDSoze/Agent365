@@ -15,4 +15,11 @@ services:
       Agent365__AgentId: ${Agent365__AgentId:-}
       Agent365__TenantId: ${Agent365__TenantId:-}
       Agent365__ClientSecret: ${Agent365__ClientSecret:-}
+      Api__RequireApiKey: ${Api__RequireApiKey:-false}
+      Api__ApiKey: ${Api__ApiKey:-}
+      Api__RequestsPerMinute: ${Api__RequestsPerMinute:-30}
+      Api__MaxMessageCharacters: ${Api__MaxMessageCharacters:-8000}
+      Api__MaxConversationIdCharacters: ${Api__MaxConversationIdCharacters:-128}
+      Conversations__MaxConversations: ${Conversations__MaxConversations:-200}
+      Conversations__IdleTimeoutMinutes: ${Conversations__IdleTimeoutMinutes:-30}
       A365_OBSERVABILITY_LOG_LEVEL: ${A365_OBSERVABILITY_LOG_LEVEL:-info}

@@ -13,11 +13,15 @@ namespace Agent365.GoldenAgent.Runtime;
 public sealed class AgentRuntime
 {
     private readonly AgentRuntimeOptions _options;
+    private readonly IHttpClientFactory _httpClientFactory;
     private readonly Lazy<AIAgent> _agent;
 
-    public AgentRuntime(IOptions<AgentRuntimeOptions> options)
+    public AgentRuntime(
+        IOptions<AgentRuntimeOptions> options,
+        IHttpClientFactory httpClientFactory)
     {
         _options = options.Value;
+        _httpClientFactory = httpClientFactory;
         _agent = new Lazy<AIAgent>(CreateAgent, LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
@@ -35,6 +39,115 @@ public sealed class AgentRuntime
             cancellationToken: cancellationToken);
 
         return response.ToString();
+    }
+
+    public async Task<RuntimeReadiness> CheckReadinessAsync(
+        CancellationToken cancellationToken)
+    {
+        var provider = _options.Provider.Trim().ToLowerInvariant();
+
+        if (string.IsNullOrWhiteSpace(_options.Model))
+        {
+            return new RuntimeReadiness(
+                false,
+                provider,
+                _options.Model,
+                false,
+                false,
+                "Agent:Model is not configured.");
+        }
+
+        if (provider == "foundry-local")
+        {
+            if (!Uri.TryCreate(_options.FoundryLocalEndpoint, UriKind.Absolute, out var endpoint))
+            {
+                return new RuntimeReadiness(
+                    false,
+                    provider,
+                    _options.Model,
+                    false,
+                    false,
+                    "Agent:FoundryLocalEndpoint is invalid.");
+            }
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient("provider-readiness");
+                var origin = new Uri(endpoint.GetLeftPart(UriPartial.Authority));
+                using var response = await client.GetAsync(
+                    new Uri(origin, "/openai/status"),
+                    cancellationToken);
+
+                return new RuntimeReadiness(
+                    response.IsSuccessStatusCode,
+                    provider,
+                    _options.Model,
+                    true,
+                    response.IsSuccessStatusCode,
+                    response.IsSuccessStatusCode
+                        ? null
+                        : $"Foundry Local status returned HTTP {(int)response.StatusCode}.");
+            }
+            catch (Exception ex) when (
+                ex is HttpRequestException or TaskCanceledException)
+            {
+                return new RuntimeReadiness(
+                    false,
+                    provider,
+                    _options.Model,
+                    true,
+                    false,
+                    $"Foundry Local is not reachable: {ex.Message}");
+            }
+        }
+
+        if (provider == "azure-openai")
+        {
+            if (!Uri.TryCreate(_options.AzureOpenAIEndpoint, UriKind.Absolute, out var endpoint))
+            {
+                return new RuntimeReadiness(
+                    false,
+                    provider,
+                    _options.Model,
+                    false,
+                    false,
+                    "Agent:AzureOpenAIEndpoint is invalid.");
+            }
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient("provider-readiness");
+                using var response = await client.GetAsync(endpoint, cancellationToken);
+
+                // Any HTTP response proves that the configured host is reachable.
+                return new RuntimeReadiness(
+                    true,
+                    provider,
+                    _options.Model,
+                    true,
+                    true,
+                    $"Azure endpoint reachable (HTTP {(int)response.StatusCode}); model/auth are validated on invocation.");
+            }
+            catch (Exception ex) when (
+                ex is HttpRequestException or TaskCanceledException)
+            {
+                return new RuntimeReadiness(
+                    false,
+                    provider,
+                    _options.Model,
+                    true,
+                    false,
+                    $"Azure OpenAI endpoint is not reachable: {ex.Message}");
+            }
+        }
+
+        return new RuntimeReadiness(
+            false,
+            provider,
+            _options.Model,
+            false,
+            false,
+            $"Unsupported Agent:Provider '{_options.Provider}'.");
     }
 
     private AIAgent CreateAgent()

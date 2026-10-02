@@ -133,6 +133,15 @@ try {
     Wait-HttpOk -Uri "$agentUrl/health"
     $report.checks.agentHealth = $true
 
+    Wait-HttpOk -Uri "$agentUrl/ready"
+    $readiness = Invoke-RestMethod -Uri "$agentUrl/ready" -Method Get
+    $report.responses.readiness = $readiness
+    $report.checks.agentReady = [bool]$readiness.ready
+
+    if (-not $report.checks.agentReady) {
+        throw "Golden Agent is live but not ready for inference."
+    }
+
     $config = Invoke-RestMethod -Uri "$agentUrl/api/config" -Method Get
     $report.responses.safeConfig = $config
     $report.checks.safeConfig = (

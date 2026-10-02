@@ -34,5 +34,9 @@ SDK/CLI prereq, identity, telemetry, CI/CD, validation.
 Foundry Local, inference diretta, Agent Framework API e sessione multi-turn.  
 **Output:** report JSON del local lab runner + log runtime.
 
+## LAB 09 — Operational Hardening
+Health/readiness, access key opzionale, rate limit, input/session guardrail e diagnostics.  
+**Output:** hardening decision sheet + evidenza test HTTP.
+
 ## CAPSTONE
 Current-state assessment, baseline, architecture, risk, identity, security/data control, operating model, POC charter, 30/60/90, demo 20 minuti.
