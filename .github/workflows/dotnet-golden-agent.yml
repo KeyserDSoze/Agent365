@@ -63,3 +63,24 @@ jobs:
       - name: Validate Docker build
         working-directory: samples/dotnet-golden-agent
         run: docker build -t agent365-golden-agent:ci .
+
+      - name: Smoke test container
+        shell: bash
+        run: |
+          docker run -d --rm \
+            --name agent365-golden-agent-ci \
+            -p 5056:8080 \
+            -e Agent365__ExportToConsole=false \
+            agent365-golden-agent:ci
+
+          trap 'docker stop agent365-golden-agent-ci >/dev/null 2>&1 || true' EXIT
+
+          for i in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:5056/health > /tmp/container-health.json; then
+              break
+            fi
+            sleep 1
+          done
+
+          curl --fail --silent http://127.0.0.1:5056/health
+          curl --fail --silent http://127.0.0.1:5056/api/config
