@@ -1,14 +1,18 @@
 # AGIC Agent 365 Golden Agent — .NET
 
-A runnable reference implementation that shows how to layer:
+A runnable reference implementation that keeps the **agent runtime**, **model runtime** and **Agent 365 control/observability plane** separate.
 
-- **Microsoft Agent Framework** — agent runtime, sessions and function tools;
-- **Azure OpenAI Chat Completions** — stable model-provider path for the baseline sample;
-- **Microsoft OpenTelemetry Distro** — local and Agent 365 telemetry;
-- **Agent 365 observability S2S** — optional custom-engine export;
-- **ASP.NET Core** — a small HTTP surface for local/container tests.
+## Default stack
 
-This sample deliberately does not perform real writes to external systems. The write-style tool only creates a mock draft response.
+- **Microsoft Agent Framework** — agent runtime, sessions and function tools
+- **Microsoft Foundry Local** — default local LLM runtime
+- **OpenAI-compatible API** — provider boundary between Agent Framework and Foundry Local
+- **Microsoft OpenTelemetry Distro** — local and Agent 365 telemetry
+- **Agent 365 observability S2S** — optional export
+- **ASP.NET Core** — HTTP API
+- **Azure OpenAI** — optional cloud fallback/provider
+
+The sample performs no real external write. Its change-request tool returns a mock draft only.
 
 ## Architecture
 
@@ -18,149 +22,228 @@ HTTP client
    v
 ASP.NET Core /api/chat
    |
-   +--> BaggageBuilder (tenant / agent / conversation)
+   +--> Agent 365 baggage (optional)
    |
    v
 Microsoft Agent Framework
    |
-   +--> Azure OpenAI Responses API
+   v
+IChatClient
+   |
+   +--> Foundry Local (default)
+   |      |
+   |      +--> local OpenAI-compatible endpoint
+   |      +--> local model cache
+   |      +--> CPU / GPU / NPU variant
+   |
+   +--> Azure OpenAI (optional)
    |
    +--> function tools
    |
    v
 Microsoft OpenTelemetry Distro
    |
-   +--> Console (default)
-   |
+   +--> Console
    +--> Agent 365 exporter (optional)
 ```
 
-## Prerequisites
+## Fastest Windows lab
 
-- .NET 8 SDK
-- Azure OpenAI resource with a deployed chat model
-- `az login` for local Azure OpenAI authentication
-- for Agent 365 export: a **standard Entra app registration** with application permission `Agent365.Observability.OtelWrite` and admin consent
+Use Foundry Local.
 
-Current Microsoft guidance identifies the observability resource as:
+```powershell
+cd samples/dotnet-golden-agent
+.\scripts\start-foundry-local.ps1 -RunAgent
+```
+
+The script:
+
+1. detects the `foundry` CLI;
+2. attempts `winget install Microsoft.FoundryLocal` when missing;
+3. starts the local OpenAI-compatible service on port 39839;
+4. downloads `phi-4-mini` if necessary;
+5. loads the best hardware-compatible variant;
+6. queries `/v1/models` to obtain the real model ID;
+7. sets `Agent__Provider`, `Agent__FoundryLocalEndpoint` and `Agent__Model`;
+8. starts this API when `-RunAgent` is supplied.
+
+First-time model/runtime downloads require internet connectivity.
+
+## Why Foundry Local
+
+For the training environment it removes unnecessary cloud dependencies:
+
+- no Azure OpenAI resource;
+- no model API key;
+- no `az login`;
+- inference stays on-device;
+- model acquisition and hardware-aware variant selection are handled by Foundry Local.
+
+The local provider is independent from Agent 365 observability. You can run completely local with console telemetry or enable Agent 365 telemetry separately.
+
+## Manual Foundry Local setup
+
+```powershell
+winget install Microsoft.FoundryLocal
+
+foundry server restart --port 39839 --idle-timeout 0
+foundry model download phi-4-mini
+foundry model load phi-4-mini
+
+foundry server status
+foundry model list --loaded --verbose
+```
+
+The golden agent expects:
 
 ```text
-api://9b975845-388f-4429-889e-eab1ef63949c/.default
+Agent__Provider=foundry-local
+Agent__FoundryLocalEndpoint=http://127.0.0.1:39839/v1
+Agent__Model=<concrete model id returned by /v1/models>
 ```
 
-## Run locally
+Do not hard-code a catalog variant in training scripts. Use an alias such as `phi-4-mini` to let Foundry Local select a compatible CPU/GPU/NPU model, then resolve the loaded model ID.
 
-```bash
-cd samples/dotnet-golden-agent
-
-export Agent__AzureOpenAIEndpoint="https://YOUR-RESOURCE.openai.azure.com/"
-export Agent__Model="gpt-4o-mini"
-
-az login
-dotnet restore
-dotnet run
-```
-
-Then:
+## Test the API
 
 ```bash
 curl http://localhost:8080/health
+curl http://localhost:8080/api/config
+```
 
+First turn:
+
+```bash
 curl -X POST http://localhost:8080/api/chat \
   -H "Content-Type: application/json" \
   -d '{"message":"What does policy AGENT-IDENTITY require?"}'
 ```
 
-ASP.NET Core may choose a different local port when launched without an explicit URL. To force the same port as Docker:
+Reuse the returned `conversationId` for multi-turn sessions.
 
-```bash
-ASPNETCORE_URLS=http://localhost:8080 dotnet run
+## Function tools
+
+### LookupPolicy
+Read-only local mock.
+
+### CreateDraftChangeRequest
+Write-shaped example that explicitly returns:
+
+```json
+{
+  "externalSideEffect": false
+}
 ```
 
-## Conversations
+This is intentional: trainees must distinguish a mock tool from an approved production write integration.
 
-Send the `conversationId` returned from the first call to continue the Agent Framework session.
+> Tool calling depends on the capabilities of the local model selected from the Foundry Local catalog.
 
-The sample uses an in-memory store. It is intentionally not production persistence.
+## Azure OpenAI fallback
 
-## Tool examples
+To use the cloud provider instead:
 
-The agent has two local function tools:
+```bash
+export Agent__Provider="azure-openai"
+export Agent__AzureOpenAIEndpoint="https://YOUR-RESOURCE.openai.azure.com/"
+export Agent__Model="<deployment-name>"
+az login
 
-- `LookupPolicy` — read-only mock policy lookup;
-- `CreateDraftChangeRequest` — produces a draft object with `externalSideEffect=false`.
+dotnet run
+```
 
-The second tool exists to teach the team to distinguish a tool that *looks like a write* from an approved production integration.
+The sample uses the stable Chat Completions adapter through `IChatClient`.
 
-## Local observability
+## Agent 365 observability
 
-Console export is on by default:
+Console export is enabled by default:
 
 ```text
 Agent365__ExportToConsole=true
 Agent365__ExportToAgent365=false
 ```
 
-The Microsoft OpenTelemetry Distro automatically instruments supported Agent Framework and Azure OpenAI operations. The HTTP endpoint also creates Agent 365 baggage when tenant/agent IDs are configured.
-
-## Enable Agent 365 export — custom-engine S2S
-
-Set:
+Enable custom-engine S2S export with a standard Entra app registration:
 
 ```bash
 export Agent365__ExportToAgent365=true
-export Agent365__AgentId="<standard-app-registration-client-id>"
+export Agent365__AgentId="<app-client-id>"
 export Agent365__TenantId="<tenant-id>"
 export Agent365__ClientSecret="<secret>"
 ```
 
-The exporter uses the Agent 365 S2S path and requests:
+Required application permission:
+
+```text
+Agent365.Observability.OtelWrite
+```
+
+The exporter requests:
 
 ```text
 api://9b975845-388f-4429-889e-eab1ef63949c/.default
 ```
 
-The `AgentId` in baggage must match the app registration Client ID used to authenticate; the sample fails fast if they differ.
-
-### Required Entra permission
-
-On the app registration, add:
-
-```text
-Agent365.Observability.OtelWrite — Application
-```
-
-Grant tenant admin consent.
-
-## Security notes
-
-- Never commit the client secret.
-- Use a secret store in real deployments.
-- `DefaultAzureCredential` is used for Azure OpenAI local development. In production, prefer a specific credential such as Managed Identity.
-- The custom-engine S2S observability path intentionally uses a standard app registration; Agent 365-enabled blueprint identities use a different S2S exchange flow.
-- Add authentication/authorization in front of `/api/chat` before exposing this service outside a trusted lab.
-- Replace the in-memory conversation store before production.
+Never commit the secret.
 
 ## Docker
+
+Build and boot:
 
 ```bash
 docker compose up --build
 ```
 
-The image can start without Azure OpenAI configuration; `/health` and `/api/config` still work. `/api/chat` returns 503 until the model endpoint is configured.
+When Foundry Local runs on the Windows host, the container reaches it through:
 
-## Validate
+```text
+http://host.docker.internal:39839/v1
+```
 
-1. `GET /health`
-2. `GET /api/config` — confirm no secret is exposed
-3. POST a first chat turn
-4. reuse `conversationId`
-5. trigger the policy tool
-6. inspect console telemetry
-7. only then enable Agent 365 export
-8. verify tenant/agent baggage and expected telemetry surfaces
+Set `Agent__Model` to the loaded model ID before invoking `/api/chat`.
 
-## Source of truth
+The container can still boot without a configured model; health/config endpoints work and chat returns a configuration error until the runtime is ready.
+
+## CI quality gate
+
+The dedicated workflow validates:
+
+1. restore;
+2. compile with warnings as errors;
+3. publish;
+4. real HTTP boot;
+5. `/health`;
+6. `/api/config`;
+7. Docker build;
+8. container boot;
+9. container health/config.
+
+A CI runner does not download a Foundry Local model; actual inference validation belongs in the Windows lab.
+
+## Production boundaries
+
+Before exposing this service outside a trusted lab:
+
+- authenticate and authorize the HTTP API;
+- move secrets to a proper secret store;
+- prefer Managed Identity for Azure-hosted cloud dependencies;
+- replace in-memory sessions with a production persistence strategy;
+- add rate limiting;
+- review tool authorization and human approval;
+- validate selected local-model tool-calling behavior;
+- define prompt/data logging policy;
+- document revocation and incident response.
+
+## Sources
+
+- Foundry Local on Windows  
+  https://learn.microsoft.com/en-us/windows/ai/foundry-local/get-started
+
+- Foundry Local CLI  
+  https://learn.microsoft.com/en-us/azure/foundry-local/reference/reference-cli
+
+- Foundry Local SDK  
+  https://learn.microsoft.com/en-us/azure/foundry-local/reference/reference-sdk-current
 
 - Agent Framework Azure OpenAI provider  
   https://learn.microsoft.com/en-us/agent-framework/agents/providers/azure-openai
@@ -168,13 +251,5 @@ The image can start without Azure OpenAI configuration; `/health` and `/api/conf
 - Microsoft OpenTelemetry Distro  
   https://learn.microsoft.com/en-us/microsoft-agent-365/developer/microsoft-opentelemetry
 
-- Agent 365 observability concepts  
-  https://learn.microsoft.com/en-us/microsoft-agent-365/developer/observability-concepts
-
-- Observability authentication setup  
+- Agent 365 observability authentication  
   https://learn.microsoft.com/en-us/microsoft-agent-365/developer/observability-authentication-setup
-
-
-## Why the baseline uses Chat Completions
-
-Microsoft Agent Framework supports both Azure OpenAI Responses and Chat Completions. Responses is the richer recommended API for hosted tools, but the current .NET Responses surface still carries evaluation/prerelease diagnostics in the Azure/OpenAI client stack. The golden baseline intentionally uses the stable Chat Completions path so the reference project builds cleanly with warnings-as-errors. A separate Responses variant can be added without changing the Agent 365 architecture.
