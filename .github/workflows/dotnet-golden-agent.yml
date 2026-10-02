@@ -28,6 +28,27 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
+      - name: Validate PowerShell lab scripts
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem "samples/dotnet-golden-agent/scripts/*.ps1"
+          foreach ($file in $files) {
+            $tokens = $null
+            $errors = $null
+            [System.Management.Automation.Language.Parser]::ParseFile(
+              $file.FullName,
+              [ref]$tokens,
+              [ref]$errors
+            ) | Out-Null
+
+            if ($errors.Count -gt 0) {
+              $errors | ForEach-Object { Write-Error "$($file.Name): $($_.Message)" }
+              exit 1
+            }
+
+            Write-Host "PowerShell syntax OK: $($file.Name)"
+          }
+
       - name: Restore
         working-directory: samples/dotnet-golden-agent
         run: dotnet restore

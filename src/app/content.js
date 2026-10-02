@@ -82,6 +82,7 @@ export const copy = {
       ['LAB 05', 'Purview data controls', 'Audit, data interaction matrix e DLP design.'],
       ['LAB 06', 'MCP & tool governance', 'Catalogo tool, risk rating e policy decision.'],
       ['LAB 07', 'Custom agent onboarding', 'SDK/CLI, identity, observability e checklist di integrazione.'],
+      ['LAB 08', 'Local golden-agent runner', 'Foundry Local, inference reale, multi-turn e report JSON verificabile.'],
       ['CAPSTONE', 'Customer-ready POC', 'Assessment, architecture, controls, demo, runbook e roadmap.']
     ],
     developerTitle: 'Developer path: dall’agente esistente ad Agent 365',
@@ -92,7 +93,8 @@ export const copy = {
       ['03', 'Protect & Govern', 'Collega Defender hunting, Purview DLP e tool/MCP governance al flusso operativo.', 'Security tutorials', 'docs/tutorials/README.md'],
       ['04', 'Validate & Operate', 'Controlla root span, licensing, auth, evidence e troubleshooting prima del go-live.', 'Reference samples', 'examples/reference-agent/README.md'],
       ['05', 'Run the Golden Agent', 'Esegui il sample .NET reale con API, sessioni, tool, Docker e observability S2S opzionale.', 'Golden Agent .NET', 'samples/dotnet-golden-agent/README.md'],
-      ['06', 'Local LLM', 'Avvia Foundry Local, scarica un modello adatto all’hardware e usa l’endpoint OpenAI-compatible in locale.', 'Foundry Local', 'docs/tutorials/07-foundry-local.md']
+      ['06', 'Local LLM', 'Avvia Foundry Local, scarica un modello adatto all’hardware e usa l’endpoint OpenAI-compatible in locale.', 'Foundry Local', 'docs/tutorials/07-foundry-local.md'],
+      ['07', 'Prove it', 'Esegui inference diretta, due turni Agent Framework e salva l’evidenza del lab.', 'Local lab runner', 'docs/tutorials/08-local-lab-runner.md']
     ],
     sourcesTitle: 'Source of truth',
     sourcesIntro: 'La knowledge base rimanda sempre alla documentazione Microsoft ufficiale. Le feature in Preview vanno ricontrollate prima di una decisione di produzione.',
@@ -171,6 +173,7 @@ export const copy = {
       ['LAB 05', 'Purview data controls', 'Audit, data interaction matrix and DLP design.'],
       ['LAB 06', 'MCP & tool governance', 'Tool catalog, risk rating and policy decision.'],
       ['LAB 07', 'Custom agent onboarding', 'SDK/CLI, identity, observability and integration checklist.'],
+      ['LAB 08', 'Local golden-agent runner', 'Foundry Local, real inference, multi-turn validation and a JSON evidence report.'],
       ['CAPSTONE', 'Customer-ready POC', 'Assessment, architecture, controls, demo, runbook and roadmap.']
     ],
     developerTitle: 'Developer path: from an existing agent to Agent 365',
@@ -181,7 +184,8 @@ export const copy = {
       ['03', 'Protect & Govern', 'Connect Defender hunting, Purview DLP and tool/MCP governance to the operating flow.', 'Security tutorials', 'docs/en/tutorials/README.md'],
       ['04', 'Validate & Operate', 'Check root spans, licensing, auth, evidence and troubleshooting before go-live.', 'Reference samples', 'examples/reference-agent/README.md'],
       ['05', 'Run the Golden Agent', 'Run the real .NET sample with API hosting, sessions, tools, Docker and optional S2S observability.', 'Golden Agent .NET', 'samples/dotnet-golden-agent/README.md'],
-      ['06', 'Local LLM', 'Start Foundry Local, download a hardware-appropriate model and use the local OpenAI-compatible endpoint.', 'Foundry Local', 'docs/en/tutorials/07-foundry-local.md']
+      ['06', 'Local LLM', 'Start Foundry Local, download a hardware-appropriate model and use the local OpenAI-compatible endpoint.', 'Foundry Local', 'docs/en/tutorials/07-foundry-local.md'],
+      ['07', 'Prove it', 'Run direct inference, two Agent Framework turns and retain lab evidence.', 'Local lab runner', 'docs/en/tutorials/08-local-lab-runner.md']
     ],
     sourcesTitle: 'Source of truth',
     sourcesIntro: 'The knowledge base always points back to official Microsoft documentation. Preview features should be revalidated before production decisions.',

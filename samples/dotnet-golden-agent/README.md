@@ -47,6 +47,18 @@ Microsoft OpenTelemetry Distro
    +--> Agent 365 exporter (optional)
 ```
 
+## Why this .NET sample uses the OpenAI-compatible endpoint
+
+Agent Framework currently documents its dedicated Foundry Local client on the Python path. The .NET sample intentionally stays on the generic `IChatClient` boundary and connects to Foundry Local's OpenAI-compatible REST service.
+
+That gives the training sample a stable provider seam:
+
+```text
+Agent Framework → IChatClient → OpenAI-compatible endpoint → Foundry Local
+```
+
+Azure OpenAI remains another implementation behind the same boundary.
+
 ## Fastest Windows lab
 
 Use Foundry Local.
@@ -63,11 +75,30 @@ The script:
 3. starts the local OpenAI-compatible service on port 39839;
 4. downloads `phi-4-mini` if necessary;
 5. loads the best hardware-compatible variant;
-6. queries `/v1/models` to obtain the real model ID;
+6. resolves the real loaded model ID across the current Foundry Local REST model surfaces;
 7. sets `Agent__Provider`, `Agent__FoundryLocalEndpoint` and `Agent__Model`;
 8. starts this API when `-RunAgent` is supplied.
 
 First-time model/runtime downloads require internet connectivity.
+
+## One-command end-to-end lab
+
+To validate the complete local chain and generate evidence:
+
+```powershell
+.\scripts\run-local-lab.ps1
+```
+
+The runner validates Foundry Local bootstrap, direct model inference, Golden Agent health/config, a first Agent Framework turn and a second turn on the same conversation. It writes a timestamped JSON report and runtime logs under `lab-output/`.
+
+Use:
+
+```powershell
+.\scripts\run-local-lab.ps1 -KeepRunning
+.\scripts\run-local-lab.ps1 -StopFoundryOnExit
+```
+
+See: `docs/tutorials/08-local-lab-runner.md`.
 
 ## Why Foundry Local
 
