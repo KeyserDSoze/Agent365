@@ -61,12 +61,16 @@ public sealed class AgentRuntime
             AIFunctionFactory.Create(CreateDraftChangeRequest)
         };
 
-        return new AzureOpenAIClient(endpoint, new DefaultAzureCredential())
+        IChatClient chatClient = new AzureOpenAIClient(
+                endpoint,
+                new DefaultAzureCredential())
             .GetChatClient(_options.Model)
-            .AsAIAgent(
-                instructions: _options.Instructions,
-                name: _options.Name,
-                tools: tools);
+            .AsIChatClient();
+
+        return chatClient.AsAIAgent(
+            instructions: _options.Instructions,
+            name: _options.Name,
+            tools: tools);
     }
 
     [Description("Returns a mock internal governance policy summary for the requested policy code.")]
