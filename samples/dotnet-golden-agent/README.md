@@ -332,6 +332,49 @@ See:
 - `docs/tutorials/09-golden-agent-hardening.md`
 - `docs/en/tutorials/09-golden-agent-hardening.md`
 
+## Run evidence and correlation
+
+Every `POST /api/chat` now creates:
+
+- a unique application `runId`;
+- a W3C `traceId`;
+- correlation to the existing `conversationId`;
+- correlation to governed tool audit records.
+
+The chat response includes all three IDs.
+
+Privacy-safe evidence:
+
+```text
+GET /api/evidence/runs
+GET /api/evidence/runs?conversationId=<id>&limit=20
+GET /api/evidence/summary
+```
+
+The evidence store records metadata only:
+
+- provider/model;
+- status and duration;
+- request/response character counts;
+- tool invocation / allow / deny counts;
+- error type;
+- run, trace and conversation IDs.
+
+It does **not** retain prompts, responses, tool arguments, tokens or secrets.
+
+Defaults:
+
+```text
+Evidence__Enabled=true
+Evidence__Capacity=500
+```
+
+The Windows local lab runner verifies evidence correlation for both turns of its multi-turn test.
+
+See:
+- `docs/tutorials/11-run-evidence-observability.md`
+- `docs/en/tutorials/11-run-evidence-observability.md`
+
 ## Docker
 
 Build and boot:
@@ -356,13 +399,14 @@ The dedicated workflow validates:
 
 1. restore;
 2. compile with warnings as errors;
-3. publish;
-4. real HTTP boot;
-5. `/health`;
-6. `/api/config`;
-7. Docker build;
-8. container boot;
-9. container health/config.
+3. HTTP guardrail, tool-governance and evidence tests;
+4. publish;
+5. real HTTP boot;
+6. `/health`;
+7. `/api/config`;
+8. Docker build;
+9. container boot;
+10. container health/config.
 
 A CI runner does not download a Foundry Local model; actual inference validation belongs in the Windows lab.
 
