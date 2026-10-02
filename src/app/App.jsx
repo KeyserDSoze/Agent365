@@ -224,9 +224,34 @@ export default function App() {
           </div>
         </section>
 
+        <section className="section developer" id="developer">
+          <div className="section-heading">
+            <p className="kicker">07 · DEVELOPER PATH</p>
+            <h2>{t.developerTitle}</h2>
+            <p>{t.developerIntro}</p>
+          </div>
+          <div className="developer-flow">
+            {t.developerSteps.map(([code, title, text, cta, url]) => (
+              <a className="dev-step" href={url} target="_blank" rel="noreferrer" key={code}>
+                <span className="dev-code">{code}</span>
+                <div>
+                  <h3>{title}</h3>
+                  <p>{text}</p>
+                  <strong>{cta} ↗</strong>
+                </div>
+              </a>
+            ))}
+          </div>
+          <div className="developer-terminal">
+            <div className="window-dots"><i/><i/><i/></div>
+            <code>gh skill add microsoft/agent365-skills</code>
+            <span>→ setup → register → observability → tools/DLP → validate</span>
+          </div>
+        </section>
+
         <section className="section sources" id="sources">
           <div className="section-heading">
-            <p className="kicker">07 · REFERENCES</p>
+            <p className="kicker">08 · REFERENCES</p>
             <h2>{t.sourcesTitle}</h2>
             <p>{t.sourcesIntro}</p>
           </div>
