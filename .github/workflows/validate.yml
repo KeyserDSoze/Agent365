@@ -38,7 +38,8 @@ jobs:
               'docs/README.md',
               'docs/en/README.md',
               'docs/16-local-model-runtime.md',
-              'samples/dotnet-golden-agent/README.md'
+              'samples/dotnet-golden-agent/README.md',
+              'examples/evidence/operations-sample.json'
             ];
             if (index.entries.length < 80) throw new Error('Knowledge index unexpectedly small');
             for (const path of required) {
