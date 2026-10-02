@@ -170,6 +170,63 @@ This is intentional: trainees must distinguish a mock tool from an approved prod
 
 > Tool calling depends on the capabilities of the local model selected from the Foundry Local catalog.
 
+## Governed function tools
+
+The function tools are no longer opaque delegates. They pass through an in-process governance layer that mirrors the Agent 365 tool-governance mental model.
+
+Registry:
+
+```text
+GET /api/tools
+```
+
+Each tool exposes:
+- operation type;
+- risk tier;
+- enabled/blocked state;
+- approval requirement;
+- reversibility;
+- external-side-effect flag;
+- owner and source.
+
+Runtime block/unblock:
+
+```text
+PUT /api/tools/{toolName}/state
+```
+
+One-time human approval:
+
+```text
+POST /api/tool-approvals
+```
+
+Approvals are:
+- bound to one tool;
+- bound to one conversation ID;
+- time-limited;
+- consumed once.
+
+Audit evidence:
+
+```text
+GET /api/tool-audit?limit=50
+```
+
+The audit stores governance metadata and decisions, not complete prompt/tool arguments.
+
+Enable approval for the write-shaped draft example:
+
+```text
+Tools__RequireApprovalForDraftChangeRequest=true
+```
+
+The sample still performs **no real external write**. The approval flow demonstrates the control pattern before connecting a real system.
+
+See:
+- `docs/tutorials/10-tool-governance-runtime.md`
+- `docs/en/tutorials/10-tool-governance-runtime.md`
+
 ## Azure OpenAI fallback
 
 To use the cloud provider instead:

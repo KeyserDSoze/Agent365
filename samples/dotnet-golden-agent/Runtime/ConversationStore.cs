@@ -48,6 +48,7 @@ public sealed class ConversationStore
             var result = await runtime.RunAsync(
                 message,
                 state.Session,
+                conversationId,
                 cancellationToken);
 
             state.LastAccessUtc = DateTimeOffset.UtcNow;

@@ -38,5 +38,9 @@ Foundry Local, inference diretta, Agent Framework API e sessione multi-turn.
 Health/readiness, access key opzionale, rate limit, input/session guardrail e diagnostics.  
 **Output:** hardening decision sheet + evidenza test HTTP.
 
+## LAB 10 — Tool Governance Runtime
+Registry, risk tier, block/unblock, approval one-shot e audit bounded.  
+**Output:** tool policy evidence + audit di allow/deny.
+
 ## CAPSTONE
 Current-state assessment, baseline, architecture, risk, identity, security/data control, operating model, POC charter, 30/60/90, demo 20 minuti.

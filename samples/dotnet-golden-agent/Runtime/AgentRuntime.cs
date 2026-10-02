@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Agent365.GoldenAgent.Configuration;
+using Agent365.GoldenAgent.Tools;
 using Azure.AI.OpenAI;
 using Azure.Identity;
 using Microsoft.Agents.AI;
@@ -14,14 +15,20 @@ public sealed class AgentRuntime
 {
     private readonly AgentRuntimeOptions _options;
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly ToolGovernanceService _tools;
+    private readonly ToolInvocationContext _toolContext;
     private readonly Lazy<AIAgent> _agent;
 
     public AgentRuntime(
         IOptions<AgentRuntimeOptions> options,
-        IHttpClientFactory httpClientFactory)
+        IHttpClientFactory httpClientFactory,
+        ToolGovernanceService tools,
+        ToolInvocationContext toolContext)
     {
         _options = options.Value;
         _httpClientFactory = httpClientFactory;
+        _tools = tools;
+        _toolContext = toolContext;
         _agent = new Lazy<AIAgent>(CreateAgent, LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
@@ -31,8 +38,11 @@ public sealed class AgentRuntime
     public async Task<string> RunAsync(
         string message,
         AgentSession session,
+        string conversationId,
         CancellationToken cancellationToken)
     {
+        using var toolScope = _toolContext.Begin(conversationId);
+
         AgentResponse response = await _agent.Value.RunAsync(
             message,
             session,
@@ -119,7 +129,6 @@ public sealed class AgentRuntime
                 var client = _httpClientFactory.CreateClient("provider-readiness");
                 using var response = await client.GetAsync(endpoint, cancellationToken);
 
-                // Any HTTP response proves that the configured host is reachable.
                 return new RuntimeReadiness(
                     true,
                     provider,
@@ -211,39 +220,17 @@ public sealed class AgentRuntime
             .AsIChatClient();
     }
 
-    [Description("Returns a mock internal governance policy summary for the requested policy code.")]
-    private static string LookupPolicy(
+    [Description("Returns a governed mock internal policy lookup result.")]
+    private ToolExecutionResult LookupPolicy(
         [Description("Policy code, for example AGENT-IDENTITY or TOOL-GOVERNANCE.")]
-        string policyCode)
-    {
-        return policyCode.Trim().ToUpperInvariant() switch
-        {
-            "AGENT-IDENTITY" =>
-                "Every production agent must have an explicit owner, a documented identity model, least-privilege permissions, and a tested revocation path.",
-            "TOOL-GOVERNANCE" =>
-                "Every write-capable or externally hosted tool must have an owner, risk tier, approved use case, logging requirement, and revocation path.",
-            "DATA-GOVERNANCE" =>
-                "Every production agent must document its data sources, classifications, allowed operations, applicable controls, and audit evidence.",
-            _ =>
-                "No mock policy was found for that code. Available examples: AGENT-IDENTITY, TOOL-GOVERNANCE, DATA-GOVERNANCE."
-        };
-    }
+        string policyCode) =>
+        _tools.LookupPolicy(policyCode);
 
-    [Description("Creates a mock draft change request. It does not modify any external system.")]
-    private static object CreateDraftChangeRequest(
+    [Description("Creates a governed mock draft change request. No external system is modified.")]
+    private ToolExecutionResult CreateDraftChangeRequest(
         [Description("Short title of the proposed change.")] string title,
-        [Description("Why the change is needed.")] string rationale)
-    {
-        var seed = $"{title}|{rationale}".GetHashCode(StringComparison.Ordinal);
-        var id = $"DRAFT-CR-{Math.Abs(seed % 100000):D5}";
-
-        return new
-        {
-            id,
-            state = "draft",
-            title,
-            rationale,
-            externalSideEffect = false
-        };
-    }
+        [Description("Why the change is needed.")] string rationale,
+        [Description("Optional one-time approval ID when policy requires human approval.")]
+        string? approvalId = null) =>
+        _tools.CreateDraftChangeRequest(title, rationale, approvalId);
 }

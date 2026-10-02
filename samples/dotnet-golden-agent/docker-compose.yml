@@ -22,4 +22,10 @@ services:
       Api__MaxConversationIdCharacters: ${Api__MaxConversationIdCharacters:-128}
       Conversations__MaxConversations: ${Conversations__MaxConversations:-200}
       Conversations__IdleTimeoutMinutes: ${Conversations__IdleTimeoutMinutes:-30}
+      Tools__EnablePolicyLookup: ${Tools__EnablePolicyLookup:-true}
+      Tools__EnableDraftChangeRequest: ${Tools__EnableDraftChangeRequest:-true}
+      Tools__RequireApprovalForDraftChangeRequest: ${Tools__RequireApprovalForDraftChangeRequest:-false}
+      Tools__AllowRuntimePolicyChanges: ${Tools__AllowRuntimePolicyChanges:-true}
+      Tools__ApprovalTtlMinutes: ${Tools__ApprovalTtlMinutes:-5}
+      Tools__AuditCapacity: ${Tools__AuditCapacity:-500}
       A365_OBSERVABILITY_LOG_LEVEL: ${A365_OBSERVABILITY_LOG_LEVEL:-info}

@@ -13,7 +13,7 @@ Questa sezione porta la knowledge base dal piano teorico all'esecuzione.
 7. [Foundry Local come model runtime](07-foundry-local.md)
 8. [Local Lab Runner end-to-end](08-local-lab-runner.md)
 9. [Hardening operativo del Golden Agent](09-golden-agent-hardening.md)
-9. [Hardening operativo del Golden Agent](09-golden-agent-hardening.md)
+10. [Tool Governance Runtime](10-tool-governance-runtime.md)
 
 ## Regola
 
