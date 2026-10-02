@@ -85,6 +85,7 @@ export const copy = {
       ['LAB 08', 'Local golden-agent runner', 'Foundry Local, inference reale, multi-turn e report JSON verificabile.'],
       ['LAB 09', 'Operational hardening', 'Readiness, access key opzionale, rate limit e limiti di sessione/input.'],
       ['LAB 10', 'Tool governance runtime', 'Registry, risk tier, block/unblock, approval one-shot e audit allow/deny.'],
+      ['LAB 11', 'Run evidence & correlation', 'Run ID, trace ID, evidence metadata-only e correlation con il tool audit.'],
       ['CAPSTONE', 'Customer-ready POC', 'Assessment, architecture, controls, demo, runbook e roadmap.']
     ],
     developerTitle: 'Developer path: dall’agente esistente ad Agent 365',
@@ -98,7 +99,8 @@ export const copy = {
       ['06', 'Local LLM', 'Avvia Foundry Local, scarica un modello adatto all’hardware e usa l’endpoint OpenAI-compatible in locale.', 'Foundry Local', 'docs/tutorials/07-foundry-local.md'],
       ['07', 'Prove it', 'Esegui inference diretta, due turni Agent Framework e salva l’evidenza del lab.', 'Local lab runner', 'docs/tutorials/08-local-lab-runner.md'],
       ['08', 'Harden the POC', 'Aggiungi readiness, access key opzionale, rate limit e limiti di sessione/input.', 'Hardening tutorial', 'docs/tutorials/09-golden-agent-hardening.md'],
-      ['09', 'Govern tools', 'Classifica i tool, blocca capability, richiedi approval e conserva evidence di allow/deny.', 'Tool governance', 'docs/tutorials/10-tool-governance-runtime.md']
+      ['09', 'Govern tools', 'Classifica i tool, blocca capability, richiedi approval e conserva evidence di allow/deny.', 'Tool governance', 'docs/tutorials/10-tool-governance-runtime.md'],
+      ['10', 'Correlate evidence', 'Collega run ID, trace ID, conversation e decisioni tool senza salvare prompt o risposte.', 'Evidence & observability', 'docs/tutorials/11-run-evidence-observability.md']
     ],
     sourcesTitle: 'Source of truth',
     sourcesIntro: 'La knowledge base rimanda sempre alla documentazione Microsoft ufficiale. Le feature in Preview vanno ricontrollate prima di una decisione di produzione.',
@@ -180,6 +182,7 @@ export const copy = {
       ['LAB 08', 'Local golden-agent runner', 'Foundry Local, real inference, multi-turn validation and a JSON evidence report.'],
       ['LAB 09', 'Operational hardening', 'Readiness, optional access key, rate limits and input/session guardrails.'],
       ['LAB 10', 'Tool governance runtime', 'Registry, risk tiers, block/unblock, one-time approval and allow/deny audit.'],
+      ['LAB 11', 'Run evidence & correlation', 'Run IDs, trace IDs, metadata-only evidence and tool-audit correlation.'],
       ['CAPSTONE', 'Customer-ready POC', 'Assessment, architecture, controls, demo, runbook and roadmap.']
     ],
     developerTitle: 'Developer path: from an existing agent to Agent 365',
@@ -193,7 +196,8 @@ export const copy = {
       ['06', 'Local LLM', 'Start Foundry Local, download a hardware-appropriate model and use the local OpenAI-compatible endpoint.', 'Foundry Local', 'docs/en/tutorials/07-foundry-local.md'],
       ['07', 'Prove it', 'Run direct inference, two Agent Framework turns and retain lab evidence.', 'Local lab runner', 'docs/en/tutorials/08-local-lab-runner.md'],
       ['08', 'Harden the POC', 'Add readiness, optional access-key protection, rate limits and input/session guardrails.', 'Hardening tutorial', 'docs/en/tutorials/09-golden-agent-hardening.md'],
-      ['09', 'Govern tools', 'Classify tools, revoke capabilities, require approval and retain allow/deny evidence.', 'Tool governance', 'docs/en/tutorials/10-tool-governance-runtime.md']
+      ['09', 'Govern tools', 'Classify tools, revoke capabilities, require approval and retain allow/deny evidence.', 'Tool governance', 'docs/en/tutorials/10-tool-governance-runtime.md'],
+      ['10', 'Correlate evidence', 'Link run IDs, trace IDs, conversations and tool decisions without storing prompt/response content.', 'Evidence & observability', 'docs/en/tutorials/11-run-evidence-observability.md']
     ],
     sourcesTitle: 'Source of truth',
     sourcesIntro: 'The knowledge base always points back to official Microsoft documentation. Preview features should be revalidated before production decisions.',
