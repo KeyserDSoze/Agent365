@@ -40,6 +40,27 @@ Microsoft Foundry Local provides:
 
 **Windows ML** is the lower-level option when bringing and controlling your own ONNX models.
 
+## Agent Framework .NET: OpenAI-compatible boundary
+
+Current Agent Framework documentation provides a dedicated `FoundryLocalClient` on the Python path; the equivalent integration is not currently documented for .NET.
+
+The .NET golden sample therefore uses:
+
+```text
+Agent Framework
+    |
+    v
+Microsoft.Extensions.AI IChatClient
+    |
+    v
+OpenAI SDK
+    |
+    v
+Foundry Local /v1/chat/completions
+```
+
+This keeps the model-provider boundary explicit and lets the same agent runtime switch between Foundry Local and Azure OpenAI without changing its sessions, tools or operating model.
+
 ## Native SDK
 
 Windows package:
@@ -96,3 +117,4 @@ The default provider is `foundry-local`; Azure OpenAI remains optional.
 - https://learn.microsoft.com/en-us/windows/ai/windows-ai-comparison
 - https://learn.microsoft.com/en-us/azure/foundry-local/reference/reference-sdk-current
 - https://learn.microsoft.com/en-us/azure/foundry-local/reference/reference-cli
+- https://learn.microsoft.com/en-us/agent-framework/integrations/by-component/model-providers/foundry-local
