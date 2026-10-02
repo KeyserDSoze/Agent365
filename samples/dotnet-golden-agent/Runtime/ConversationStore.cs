@@ -20,6 +20,8 @@ public sealed class ConversationStore
     public async Task<string> RunAsync(
         string conversationId,
         string message,
+        string runId,
+        string traceId,
         AgentRuntime runtime,
         CancellationToken cancellationToken)
     {
@@ -49,6 +51,8 @@ public sealed class ConversationStore
                 message,
                 state.Session,
                 conversationId,
+                runId,
+                traceId,
                 cancellationToken);
 
             state.LastAccessUtc = DateTimeOffset.UtcNow;
