@@ -96,7 +96,9 @@ public sealed class McpIntegrationTests
             arguments,
             cancellationToken: timeout.Token);
 
-        var text = result.ToString();
+        var text = result?.ToString()
+            ?? throw new InvalidOperationException(
+                "MCP tool invocation returned a null result.");
 
         Assert.Contains(
             "AGENT-IDENTITY",
