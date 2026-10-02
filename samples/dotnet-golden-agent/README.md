@@ -47,6 +47,18 @@ Microsoft OpenTelemetry Distro
    +--> Agent 365 exporter (optional)
 ```
 
+## Why this .NET sample uses the OpenAI-compatible endpoint
+
+Agent Framework currently documents its dedicated Foundry Local client on the Python path. The .NET sample intentionally stays on the generic `IChatClient` boundary and connects to Foundry Local's OpenAI-compatible REST service.
+
+That gives the training sample a stable provider seam:
+
+```text
+Agent Framework → IChatClient → OpenAI-compatible endpoint → Foundry Local
+```
+
+Azure OpenAI remains another implementation behind the same boundary.
+
 ## Fastest Windows lab
 
 Use Foundry Local.
