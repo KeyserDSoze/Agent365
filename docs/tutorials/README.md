@@ -14,6 +14,7 @@ Questa sezione porta la knowledge base dal piano teorico all'esecuzione.
 8. [Local Lab Runner end-to-end](08-local-lab-runner.md)
 9. [Hardening operativo del Golden Agent](09-golden-agent-hardening.md)
 10. [Tool Governance Runtime](10-tool-governance-runtime.md)
+11. [Run Evidence & Observability Correlation](11-run-evidence-observability.md)
 
 ## Regola
 
