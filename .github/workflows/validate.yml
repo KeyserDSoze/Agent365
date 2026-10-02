@@ -53,6 +53,18 @@ jobs:
             if (!index.entries.some(entry => entry.search?.includes('foundry local'))) {
               throw new Error('Full-text search payload was not generated');
             }
+            const operations = JSON.parse(
+              readFileSync('./dist/content/examples/evidence/operations-sample.json', 'utf8')
+            );
+            if (operations.schema !== 'agent365-golden-agent-evidence/v1') {
+              throw new Error('Unexpected operations evidence sample schema');
+            }
+            if (operations.capturesContent !== false) {
+              throw new Error('Operations sample must remain metadata-only');
+            }
+            if (!Array.isArray(operations.runs) || operations.runs.length < 5) {
+              throw new Error('Operations sample does not contain enough run evidence');
+            }
             console.log('Knowledge artifact OK:', index.entries.length, 'files');
           "
 
