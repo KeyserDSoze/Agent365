@@ -47,6 +47,27 @@ Sono API Windows ad alto livello per capability AI pronte. Alcune richiedono Cop
 ### Windows ML
 È il livello più flessibile per portare modelli ONNX propri e controllare direttamente l'inference stack.
 
+## Agent Framework .NET: boundary OpenAI-compatible
+
+La documentazione corrente di Agent Framework espone un `FoundryLocalClient` dedicato nel percorso Python; il supporto equivalente non è attualmente documentato per .NET.
+
+Per questo il golden sample .NET usa:
+
+```text
+Agent Framework
+    |
+    v
+Microsoft.Extensions.AI IChatClient
+    |
+    v
+OpenAI SDK
+    |
+    v
+Foundry Local /v1/chat/completions
+```
+
+Questo non è un workaround casuale: mantiene esplicito il model-provider boundary e permette di sostituire Foundry Local con Azure OpenAI senza modificare sessioni, tool o operating model dell'agente.
+
 ## SDK nativo
 
 Il percorso Windows corrente usa:
@@ -143,3 +164,4 @@ Il provider predefinito è `foundry-local`; Azure OpenAI rimane selezionabile tr
 - https://learn.microsoft.com/en-us/windows/ai/windows-ai-comparison
 - https://learn.microsoft.com/en-us/azure/foundry-local/reference/reference-sdk-current
 - https://learn.microsoft.com/en-us/azure/foundry-local/reference/reference-cli
+- https://learn.microsoft.com/en-us/agent-framework/integrations/by-component/model-providers/foundry-local
