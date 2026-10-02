@@ -60,3 +60,21 @@ setup → register → instrument → tools/DLP → validate → operate
 ```
 
 For new observability integrations, the project follows Microsoft's current recommendation to use **Microsoft OpenTelemetry Distro** rather than the deprecated Agent 365 Observability SDK.
+
+
+## Runnable .NET golden sample
+
+The repository includes a buildable and containerized reference implementation under:
+
+```text
+samples/dotnet-golden-agent/
+```
+
+It demonstrates Microsoft Agent Framework + Azure OpenAI + Microsoft OpenTelemetry + optional Agent 365 S2S observability, with multi-turn sessions, safe mock tools, Docker and automated smoke tests.
+
+Start here:
+- [Golden Agent README](samples/dotnet-golden-agent/README.md)
+- [Italian end-to-end tutorial](docs/tutorials/06-dotnet-golden-agent.md)
+- [English end-to-end tutorial](docs/en/tutorials/06-dotnet-golden-agent.md)
+
+The sample is a **lab/reference implementation**, not a production security boundary. Add API authentication, managed secrets, persistent session storage and deployment-specific controls before exposing it outside a trusted environment.
