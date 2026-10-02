@@ -14,13 +14,62 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+
       - name: Install dependencies
         working-directory: src
         run: npm install
+
       - name: Build
         working-directory: src
         run: npm run build
+
+      - name: Validate knowledge artifact
+        working-directory: src
+        run: |
+          node --input-type=module -e "
+            import { readFileSync, existsSync } from 'node:fs';
+            const index = JSON.parse(readFileSync('./dist/content/index.json', 'utf8'));
+            const required = [
+              'docs/README.md',
+              'docs/en/README.md',
+              'docs/16-local-model-runtime.md',
+              'samples/dotnet-golden-agent/README.md'
+            ];
+            if (index.entries.length < 80) throw new Error('Knowledge index unexpectedly small');
+            for (const path of required) {
+              if (!index.entries.some(entry => entry.path === path)) {
+                throw new Error('Missing knowledge asset: ' + path);
+              }
+              if (!existsSync('./dist/content/' + path)) {
+                throw new Error('Missing copied file: ' + path);
+              }
+            }
+            if (!index.entries.some(entry => entry.search?.includes('foundry local'))) {
+              throw new Error('Full-text search payload was not generated');
+            }
+            console.log('Knowledge artifact OK:', index.entries.length, 'files');
+          "
+
+      - name: Smoke test static site and knowledge API
+        working-directory: src
+        shell: bash
+        run: |
+          npm run preview -- --host 127.0.0.1 --port 4173 > /tmp/agent365-site.log 2>&1 &
+          pid=$!
+          trap 'kill $pid 2>/dev/null || true' EXIT
+
+          for i in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:4173/Agent365/ > /tmp/site.html; then
+              break
+            fi
+            sleep 1
+          done
+
+          curl --fail --silent http://127.0.0.1:4173/Agent365/
+          curl --fail --silent http://127.0.0.1:4173/Agent365/content/index.json
+          curl --fail --silent http://127.0.0.1:4173/Agent365/content/docs/README.md
