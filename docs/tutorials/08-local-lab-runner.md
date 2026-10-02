@@ -106,11 +106,14 @@ File:
 ```text
 latest.json
 lab-YYYYMMDD-HHMMSS.json
+operations-export.json
 agent-stdout.log
 agent-stderr.log
 ```
 
 La cartella è esclusa da Git.
+
+`operations-export.json` usa lo schema `agent365-golden-agent-evidence/v1` ed è pronto per essere caricato nella sezione **Operations** del sito.
 
 ## Esempio report
 
