@@ -1,4 +1,6 @@
 using Agent365.GoldenAgent.Configuration;
+using Azure.Core;
+using Azure.Identity;
 using Microsoft.OpenTelemetry;
 
 namespace Agent365.GoldenAgent.Telemetry;
@@ -11,6 +13,24 @@ public static class ObservabilityExtensions
         var options = builder.Configuration
             .GetSection(Agent365ObservabilityOptions.SectionName)
             .Get<Agent365ObservabilityOptions>() ?? new();
+
+        ClientSecretCredential? credential = null;
+
+        if (options.ExportToAgent365)
+        {
+            if (string.IsNullOrWhiteSpace(options.TenantId) ||
+                string.IsNullOrWhiteSpace(options.AgentId) ||
+                string.IsNullOrWhiteSpace(options.ClientSecret))
+            {
+                throw new InvalidOperationException(
+                    "Agent365 export requires TenantId, AgentId and ClientSecret.");
+            }
+
+            credential = new ClientSecretCredential(
+                options.TenantId,
+                options.AgentId,
+                options.ClientSecret);
+        }
 
         builder.UseMicrosoftOpenTelemetry(otel =>
         {
@@ -27,11 +47,22 @@ public static class ObservabilityExtensions
                 otel.Agent365.Exporter.UseS2SEndpoint = true;
                 otel.Agent365.Exporter.TokenResolver = async (agentId, tenantId) =>
                 {
-                    using var scope = builder.Services.BuildServiceProvider().CreateScope();
-                    var tokenProvider = scope.ServiceProvider
-                        .GetRequiredService<Agent365TokenProvider>();
+                    if (!string.Equals(agentId, options.AgentId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new InvalidOperationException(
+                            "Baggage agent ID does not match the configured app registration Client ID.");
+                    }
 
-                    return await tokenProvider.GetTokenAsync(agentId, tenantId);
+                    if (!string.Equals(tenantId, options.TenantId, StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new InvalidOperationException(
+                            "Baggage tenant ID does not match the configured Tenant ID.");
+                    }
+
+                    var token = await credential!.GetTokenAsync(
+                        new TokenRequestContext([Agent365ObservabilityOptions.ObservabilityScope]));
+
+                    return token.Token;
                 };
             }
 
