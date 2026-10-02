@@ -5,12 +5,14 @@ ENV ASPNETCORE_URLS=http://+:8080
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY Agent365.GoldenAgent.csproj .
-RUN dotnet restore
-COPY . .
-RUN dotnet publish -c Release -o /out --no-restore
+
+COPY Agent365.GoldenAgent.csproj ./
+RUN dotnet restore ./Agent365.GoldenAgent.csproj
+
+COPY . ./
+RUN dotnet publish ./Agent365.GoldenAgent.csproj -c Release -o /out
 
 FROM base AS final
 WORKDIR /app
-COPY --from=build /out .
+COPY --from=build /out ./
 ENTRYPOINT ["dotnet", "Agent365.GoldenAgent.dll"]
