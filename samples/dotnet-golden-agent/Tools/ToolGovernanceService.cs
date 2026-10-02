@@ -103,6 +103,18 @@ public sealed class ToolGovernanceService
         return approval;
     }
 
+    public ToolRunStats GetRunStats(string runId)
+    {
+        var records = _audit
+            .Where(x => string.Equals(x.RunId, runId, StringComparison.Ordinal))
+            .ToArray();
+
+        return new ToolRunStats(
+            Total: records.Length,
+            Allowed: records.Count(x => x.Decision == "allowed"),
+            Denied: records.Count(x => x.Decision == "denied"));
+    }
+
     public IReadOnlyList<ToolAuditRecord> GetAudit(int limit = 50)
     {
         var bounded = Math.Clamp(limit, 1, Math.Min(_options.AuditCapacity, 500));
@@ -215,7 +227,9 @@ public sealed class ToolGovernanceService
 
             AddAudit(new ToolAuditRecord(
                 DateTimeOffset.UtcNow,
+                _context.RunId,
                 _context.ConversationId,
+                _context.TraceId,
                 tool.Name,
                 tool.Operation,
                 tool.RiskTier,
@@ -239,7 +253,9 @@ public sealed class ToolGovernanceService
 
             AddAudit(new ToolAuditRecord(
                 DateTimeOffset.UtcNow,
+                _context.RunId,
                 _context.ConversationId,
+                _context.TraceId,
                 tool.Name,
                 tool.Operation,
                 tool.RiskTier,
