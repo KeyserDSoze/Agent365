@@ -42,5 +42,9 @@ Health/readiness, optional access key, rate limits, input/session guardrails and
 Registry, risk tiers, block/unblock, one-time approval and bounded audit.  
 **Output:** tool-policy evidence + allow/deny audit.
 
+## LAB 11 — Run Evidence & Correlation
+Run IDs, trace IDs, privacy-safe evidence, tool-audit correlation and operational summary.  
+**Output:** evidence snapshot + correlation proof.
+
 ## CAPSTONE
 Current-state assessment, baseline, architecture, risk, identity, security/data controls, operating model, POC charter, 30/60/90 and a 20-minute demo.
