@@ -24,7 +24,7 @@ function Wait-HttpOk {
 
     for ($i = 1; $i -le $Attempts; $i++) {
         try {
-            $response = Invoke-WebRequest -Uri $Uri -UseBasicParsing -TimeoutSec 5
+            $response = Invoke-WebRequest -Uri $Uri -TimeoutSec 5
             if ($response.StatusCode -ge 200 -and $response.StatusCode -lt 300) {
                 return
             }
@@ -44,11 +44,21 @@ function Invoke-JsonPost {
         [hashtable]$Body
     )
 
-    Invoke-RestMethod         -Uri $Uri         -Method Post         -ContentType "application/json"         -Body ($Body | ConvertTo-Json -Depth 10)         -TimeoutSec 120
+    $params = @{
+        Uri = $Uri
+        Method = "Post"
+        ContentType = "application/json"
+        Body = ($Body | ConvertTo-Json -Depth 10)
+        TimeoutSec = 120
+    }
+
+    return Invoke-RestMethod @params
 }
 
 $startedAt = Get-Date
 $agentProcess = $null
+$failureMessage = $null
+
 $report = [ordered]@{
     startedAt = $startedAt.ToString("o")
     machine = $env:COMPUTERNAME
@@ -66,7 +76,9 @@ $report = [ordered]@{
 try {
     Write-Host ""
     Write-Host "=== 1. Prepare Foundry Local ==="
-    . (Join-Path $PSScriptRoot "start-foundry-local.ps1")         -ModelAlias $ModelAlias         -Port $FoundryPort
+
+    $bootstrap = Join-Path $PSScriptRoot "start-foundry-local.ps1"
+    . $bootstrap -ModelAlias $ModelAlias -Port $FoundryPort
 
     $report.modelId = $env:Agent__Model
     $report.foundryEndpoint = $env:Agent__FoundryLocalEndpoint
@@ -74,16 +86,19 @@ try {
 
     Write-Host ""
     Write-Host "=== 2. Direct local model inference ==="
-    $rawCompletion = Invoke-JsonPost         -Uri "$($env:Agent__FoundryLocalEndpoint)/chat/completions"         -Body @{
-            model = $env:Agent__Model
-            messages = @(
-                @{
-                    role = "user"
-                    content = "Reply with one short sentence explaining why an AI agent inventory is useful."
-                }
-            )
-            temperature = 0.2
-        }
+
+    $directBody = @{
+        model = $env:Agent__Model
+        messages = @(
+            @{
+                role = "user"
+                content = "Reply with one short sentence explaining why an AI agent inventory is useful."
+            }
+        )
+        temperature = 0.2
+    }
+
+    $rawCompletion = Invoke-JsonPost -Uri "$($env:Agent__FoundryLocalEndpoint)/chat/completions" -Body $directBody
 
     $rawText = [string]$rawCompletion.choices[0].message.content
     if ([string]::IsNullOrWhiteSpace($rawText)) {
@@ -96,6 +111,7 @@ try {
 
     Write-Host ""
     Write-Host "=== 3. Start Golden Agent API ==="
+
     $env:ASPNETCORE_URLS = $agentUrl
     $env:Agent365__ExportToConsole = "true"
     $env:Agent365__ExportToAgent365 = "false"
@@ -103,7 +119,16 @@ try {
     $stdout = Join-Path $outputDir "agent-stdout.log"
     $stderr = Join-Path $outputDir "agent-stderr.log"
 
-    $agentProcess = Start-Process         -FilePath "dotnet"         -ArgumentList @("run", "--project", $project, "--no-launch-profile")         -WorkingDirectory $root         -RedirectStandardOutput $stdout         -RedirectStandardError $stderr         -PassThru
+    $processParams = @{
+        FilePath = "dotnet"
+        ArgumentList = @("run", "--project", $project, "--no-launch-profile")
+        WorkingDirectory = $root
+        RedirectStandardOutput = $stdout
+        RedirectStandardError = $stderr
+        PassThru = $true
+    }
+
+    $agentProcess = Start-Process @processParams
 
     Wait-HttpOk -Uri "$agentUrl/health"
     $report.checks.agentHealth = $true
@@ -121,9 +146,12 @@ try {
 
     Write-Host ""
     Write-Host "=== 4. First Agent Framework turn ==="
-    $first = Invoke-JsonPost         -Uri "$agentUrl/api/chat"         -Body @{
-            message = "In one short sentence, explain why ownership matters for an enterprise AI agent."
-        }
+
+    $firstBody = @{
+        message = "In one short sentence, explain why ownership matters for an enterprise AI agent."
+    }
+
+    $first = Invoke-JsonPost -Uri "$agentUrl/api/chat" -Body $firstBody
 
     if ([string]::IsNullOrWhiteSpace([string]$first.output)) {
         throw "Golden Agent first turn returned an empty output."
@@ -135,10 +163,13 @@ try {
 
     Write-Host ""
     Write-Host "=== 5. Multi-turn session ==="
-    $second = Invoke-JsonPost         -Uri "$agentUrl/api/chat"         -Body @{
-            conversationId = $first.conversationId
-            message = "Now add one concise sentence about least privilege."
-        }
+
+    $secondBody = @{
+        conversationId = $first.conversationId
+        message = "Now add one concise sentence about least privilege."
+    }
+
+    $second = Invoke-JsonPost -Uri "$agentUrl/api/chat" -Body $secondBody
 
     if ([string]::IsNullOrWhiteSpace([string]$second.output)) {
         throw "Golden Agent second turn returned an empty output."
@@ -157,10 +188,12 @@ try {
     Write-Host "LOCAL LAB: PASS"
 }
 catch {
-    $report.error = $_.Exception.Message
+    $failureMessage = $_.Exception.Message
+    $report.error = $failureMessage
+
     Write-Host ""
     Write-Host "LOCAL LAB: FAIL"
-    Write-Error $_
+    Write-Host $failureMessage
 }
 finally {
     $finishedAt = Get-Date
@@ -194,5 +227,10 @@ finally {
 }
 
 if (-not $report.success) {
+    if ([string]::IsNullOrWhiteSpace($failureMessage)) {
+        $failureMessage = "Local lab failed."
+    }
+
+    Write-Error $failureMessage
     exit 1
 }
