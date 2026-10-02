@@ -41,9 +41,9 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
 
         var json = await client.GetStringAsync("/api/config");
 
-        Assert.DoesNotContain("clientSecret", json, StringComparison.OrdinalIgnoreCase);
-        Assert.DoesNotContain(""apiKey"", json, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains("requireApiKey", json, StringComparison.OrdinalIgnoreCase);
+        Assert.False(json.Contains("clientSecret", StringComparison.OrdinalIgnoreCase));
+        Assert.False(json.Contains("\"apiKey\"", StringComparison.OrdinalIgnoreCase));
+        Assert.True(json.Contains("requireApiKey", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
