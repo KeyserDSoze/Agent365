@@ -301,11 +301,16 @@ app.MapPost("/api/tool-approvals", (
 
 app.MapGet("/api/tool-audit", (
     int? limit,
+    string? runId,
+    string? conversationId,
     ToolGovernanceService tools) =>
 {
     return Results.Ok(new
     {
-        items = tools.GetAudit(limit ?? 50)
+        items = tools.GetAudit(
+            limit ?? 50,
+            runId,
+            conversationId)
     });
 });
 
