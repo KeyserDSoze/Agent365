@@ -1,15 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { getJourneyStages, getStageForDocument } from './journey.js'
 import { knowledgeRoute } from './routing.js'
 
-function groupLabel(path, lang) {
-  if (path === 'README.md') return 'Repository'
-  if (path.includes('/tutorials/')) return lang === 'it' ? 'Tutorial pratici' : 'Hands-on tutorials'
-  if (path.startsWith('docs/en/')) return 'Academy EN'
-  if (path.startsWith('docs/')) return 'Academy IT'
-  if (path.startsWith('examples/')) return lang === 'it' ? 'Asset & esempi' : 'Assets & examples'
-  if (path.startsWith('samples/')) return lang === 'it' ? 'Sample tecnici' : 'Technical samples'
-  return lang === 'it' ? 'Altro' : 'Other'
+function fallbackGroup(path, lang) {
+  if (path === 'README.md') return lang === 'it' ? 'Repository & orientamento' : 'Repository & orientation'
+  if (path.includes('training') || path.includes('labs')) return lang === 'it' ? 'Percorsi trasversali' : 'Cross-cutting paths'
+  if (path.includes('sources')) return lang === 'it' ? 'Fonti e riferimenti' : 'Sources & references'
+  return lang === 'it' ? 'Reference & altri contenuti' : 'Reference & other content'
 }
 
 export default function KnowledgeIndex({ lang }) {
@@ -17,6 +15,7 @@ export default function KnowledgeIndex({ lang }) {
   const [query, setQuery] = useState('')
   const [error, setError] = useState('')
   const baseUrl = import.meta.env.BASE_URL + 'content/'
+  const stages = getJourneyStages(lang)
 
   useEffect(() => {
     fetch(baseUrl + 'index.json')
@@ -34,42 +33,74 @@ export default function KnowledgeIndex({ lang }) {
     if (!q) return languageEntries
 
     const terms = q.split(/\s+/).filter(Boolean)
+
     return languageEntries
       .map(entry => {
-        const haystack = entry.search || (entry.title + ' ' + entry.path + ' ' + (entry.excerpt || '')).toLowerCase()
+        const stageId = getStageForDocument(entry.path)
+        const stage = stages.find(item => item.id === stageId)
+        const stageText = stage ? stage.title + ' ' + stage.summary : ''
+        const haystack = (entry.search || (entry.title + ' ' + entry.path + ' ' + (entry.excerpt || ''))) + ' ' + stageText.toLowerCase()
+
         const score = terms.reduce((acc, term) => {
           if (!haystack.includes(term)) return -999
           if (entry.title.toLowerCase().includes(term)) return acc + 6
           if (entry.path.toLowerCase().includes(term)) return acc + 3
+          if (stageText.toLowerCase().includes(term)) return acc + 2
           return acc + 1
         }, 0)
+
         return { entry, score }
       })
       .filter(item => item.score >= 0)
       .sort((a, b) => b.score - a.score || a.entry.path.localeCompare(b.entry.path))
       .map(item => item.entry)
-  }, [entries, lang, query])
+  }, [entries, lang, query, stages])
 
   const groups = useMemo(() => {
     const grouped = new Map()
+
     for (const entry of results) {
-      const label = groupLabel(entry.path, lang)
-      if (!grouped.has(label)) grouped.set(label, [])
-      grouped.get(label).push(entry)
+      const stageId = getStageForDocument(entry.path)
+      const stage = stages.find(item => item.id === stageId)
+      const key = stage ? stage.id : fallbackGroup(entry.path, lang)
+
+      if (!grouped.has(key)) {
+        grouped.set(key, {
+          stage,
+          label: stage ? stage.number + ' · ' + stage.title : key,
+          summary: stage ? stage.summary : '',
+          items: []
+        })
+      }
+
+      grouped.get(key).items.push(entry)
     }
-    return [...grouped.entries()]
-  }, [results, lang])
+
+    const ordered = []
+    for (const stage of stages) {
+      if (grouped.has(stage.id)) ordered.push(grouped.get(stage.id))
+    }
+
+    for (const [key, value] of grouped) {
+      if (!stages.some(stage => stage.id === key)) ordered.push(value)
+    }
+
+    return ordered
+  }, [results, stages, lang])
 
   return (
     <div className="route-page knowledge-index-page">
       <section className="section">
         <div className="knowledge-index-hero">
           <div>
-            <p className="kicker">09 · KNOWLEDGE BASE</p>
-            <h1>{lang === 'it' ? 'La repository, resa leggibile.' : 'The repository, made readable.'}</h1>
+            <p className="kicker">KNOWLEDGE BASE</p>
+            <h1>{lang === 'it' ? 'Cerca per lavoro da fare, non per cartella.' : 'Search by job to do, not by folder.'}</h1>
             <p>{lang === 'it'
-              ? 'Cerca manuali, tutorial, sample e asset. Ogni risultato apre una pagina HTML dedicata, con URL condivisibile e link al Markdown originale.'
-              : 'Search manuals, tutorials, samples and assets. Every result opens a dedicated HTML page with a shareable URL and a link to the original Markdown.'}</p>
+              ? 'Manuali, tutorial, sample e asset sono raggruppati secondo il percorso Capire → Preparare → Costruire → Governare → Operare. Il path della repository resta visibile, ma non guida più l’esperienza.'
+              : 'Manuals, tutorials, samples and assets are grouped by Understand → Prepare → Build → Govern → Operate. Repository paths remain visible, but no longer drive the experience.'}</p>
+            <Link className="knowledge-journey-link" to="/journey">
+              {lang === 'it' ? 'Non sai dove iniziare? Apri il percorso guidato' : 'Not sure where to start? Open the guided journey'} →
+            </Link>
           </div>
 
           <label className="knowledge-search">
@@ -77,7 +108,7 @@ export default function KnowledgeIndex({ lang }) {
             <input
               value={query}
               onChange={event => setQuery(event.target.value)}
-              placeholder={lang === 'it' ? 'Cerca nella knowledge base…' : 'Search the knowledge base…'}
+              placeholder={lang === 'it' ? 'Cerca un problema, capability o output…' : 'Search a problem, capability or output…'}
             />
             {query && <button onClick={() => setQuery('')} aria-label="Clear search">×</button>}
           </label>
@@ -86,24 +117,33 @@ export default function KnowledgeIndex({ lang }) {
         {error && <p className="kb-error">Knowledge index unavailable: {error}</p>}
 
         <div className="knowledge-groups">
-          {groups.map(([label, items]) => (
-            <section className="knowledge-group" key={label}>
-              <div className="knowledge-group-head">
-                <h2>{label}</h2>
-                <span>{items.length}</span>
+          {groups.map(group => (
+            <section className="knowledge-group" key={group.label}>
+              <div className="knowledge-group-head knowledge-group-head-rich">
+                <div>
+                  <h2>{group.label}</h2>
+                  {group.summary && <p>{group.summary}</p>}
+                </div>
+                <span>{group.items.length}</span>
               </div>
+
               <div className="knowledge-card-grid">
-                {items.map(entry => (
-                  <Link to={knowledgeRoute(entry.path)} className="knowledge-card" key={entry.path}>
-                    <div className="knowledge-card-meta">
-                      <span>{entry.kind === 'markdown' ? 'ARTICLE' : 'SOURCE'}</span>
-                      <code>{entry.path}</code>
-                    </div>
-                    <h3>{entry.title}</h3>
-                    <p>{entry.excerpt}</p>
-                    <strong>{lang === 'it' ? 'Apri pagina' : 'Open page'} →</strong>
-                  </Link>
-                ))}
+                {group.items.map(entry => {
+                  const stageId = getStageForDocument(entry.path)
+                  const stage = stages.find(item => item.id === stageId)
+
+                  return (
+                    <Link to={knowledgeRoute(entry.path)} className="knowledge-card" key={entry.path}>
+                      <div className="knowledge-card-meta">
+                        <span>{stage ? stage.label.toUpperCase() : (entry.kind === 'markdown' ? 'ARTICLE' : 'SOURCE')}</span>
+                        <code>{entry.path}</code>
+                      </div>
+                      <h3>{entry.title}</h3>
+                      <p>{entry.excerpt}</p>
+                      <strong>{lang === 'it' ? 'Apri nel percorso' : 'Open in journey'} →</strong>
+                    </Link>
+                  )
+                })}
               </div>
             </section>
           ))}
