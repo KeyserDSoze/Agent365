@@ -320,5 +320,49 @@
       "owner": "AGIC Agent 365 Lab",
       "source": "BuiltIn"
     }
-  ]
+  ],
+  "reliability": {
+    "generatedAt": "2026-10-03T00:05:00+02:00",
+    "status": "degraded",
+    "score": 70,
+    "evaluatedRuns": 10,
+    "failureRate": 0.2,
+    "averageLatencyMs": 1842.6,
+    "toolDenyRate": 0.25,
+    "consecutiveFailures": 0,
+    "errorTypes": {
+      "InvalidOperationException": 1,
+      "HttpRequestException": 1
+    },
+    "findings": [
+      {
+        "code": "failure-rate",
+        "severity": "warning",
+        "title": "Run failure rate",
+        "detail": "Run failure rate is 0.2 and crossed the warning threshold 0.1.",
+        "observedValue": 0.2,
+        "threshold": 0.1,
+        "unit": "ratio",
+        "recommendedAction": "Inspect the most recent failed runs, provider readiness and error taxonomy.",
+        "runIds": [
+          "run-c30251ef",
+          "run-i99d583a"
+        ]
+      },
+      {
+        "code": "tool-deny-rate",
+        "severity": "warning",
+        "title": "Tool deny rate",
+        "detail": "Tool deny rate is 0.25 and crossed the warning threshold 0.15.",
+        "observedValue": 0.25,
+        "threshold": 0.15,
+        "unit": "ratio",
+        "recommendedAction": "Review blocked capabilities, approval requirements and whether the agent is attempting unsupported actions.",
+        "runIds": [
+          "run-c30251ef",
+          "run-f66192d1"
+        ]
+      }
+    ]
+  }
 }
