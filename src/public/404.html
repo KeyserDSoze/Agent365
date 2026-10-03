@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>Agent 365 Knowledge Hub</title>
+  </head>
+  <body>
+    <script>
+      (function () {
+        var base = '/Agent365'
+        var path = window.location.pathname + window.location.search + window.location.hash
+        sessionStorage.setItem('a365-spa-redirect', path)
+        window.location.replace(base + '/')
+      })()
+    </script>
+  </body>
+</html>
