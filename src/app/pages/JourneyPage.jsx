@@ -3,6 +3,14 @@ import { getJourneyStages } from '../journey.js'
 import { knowledgeRoute } from '../routing.js'
 import PageIntro from '../PageIntro.jsx'
 
+function humanize(path) {
+  return (path.split('/').pop() || path)
+    .replace(/\.(md|kql|csv|json)$/i, '')
+    .replace(/^\d+-/, '')
+    .replaceAll('-', ' ')
+    .replace(/\b\w/g, value => value.toUpperCase())
+}
+
 export default function JourneyPage({ lang }) {
   const stages = getJourneyStages(lang)
 
@@ -67,7 +75,7 @@ export default function JourneyPage({ lang }) {
                   <span>{lang === 'it' ? 'Letture consigliate' : 'Recommended reading'}</span>
                   {stage.docs.slice(0, 4).map(path => (
                     <Link to={knowledgeRoute(path)} key={path}>
-                      {path.split('/').pop()?.replace(/\.md$|\.kql$/i, '')} →
+                      {humanize(path)} →
                     </Link>
                   ))}
                 </div>
