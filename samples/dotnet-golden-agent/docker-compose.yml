@@ -30,4 +30,13 @@ services:
       Tools__AuditCapacity: ${Tools__AuditCapacity:-500}
       Evidence__Enabled: ${Evidence__Enabled:-true}
       Evidence__Capacity: ${Evidence__Capacity:-500}
+      Reliability__WindowRuns: ${Reliability__WindowRuns:-50}
+      Reliability__MinimumRuns: ${Reliability__MinimumRuns:-5}
+      Reliability__FailureRateWarning: ${Reliability__FailureRateWarning:-0.10}
+      Reliability__FailureRateCritical: ${Reliability__FailureRateCritical:-0.25}
+      Reliability__AverageLatencyWarningMs: ${Reliability__AverageLatencyWarningMs:-2500}
+      Reliability__AverageLatencyCriticalMs: ${Reliability__AverageLatencyCriticalMs:-5000}
+      Reliability__ToolDenyRateWarning: ${Reliability__ToolDenyRateWarning:-0.15}
+      Reliability__ToolDenyRateCritical: ${Reliability__ToolDenyRateCritical:-0.30}
+      Reliability__ConsecutiveFailuresCritical: ${Reliability__ConsecutiveFailuresCritical:-3}
       A365_OBSERVABILITY_LOG_LEVEL: ${A365_OBSERVABILITY_LOG_LEVEL:-info}
