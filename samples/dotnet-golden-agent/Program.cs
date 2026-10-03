@@ -1,5 +1,6 @@
 using System.Threading.RateLimiting;
 using Agent365.GoldenAgent.Configuration;
+using Agent365.GoldenAgent.Mcp;
 using Agent365.GoldenAgent.Runtime;
 using Agent365.GoldenAgent.Reliability;
 using Agent365.GoldenAgent.Security;
@@ -81,6 +82,29 @@ builder.Services
     .ValidateOnStart();
 
 builder.Services
+    .AddOptions<McpBridgeOptions>()
+    .Bind(builder.Configuration.GetSection(McpBridgeOptions.SectionName))
+    .Validate(
+        options => options.InitializationTimeoutSeconds is >= 5 and <= 120,
+        "Mcp:InitializationTimeoutSeconds must be between 5 and 120.")
+    .Validate(
+        options => options.ShutdownTimeoutSeconds is >= 1 and <= 60,
+        "Mcp:ShutdownTimeoutSeconds must be between 1 and 60.")
+    .Validate(
+        options => options.AuditCapacity is >= 10 and <= 10_000,
+        "Mcp:AuditCapacity must be between 10 and 10000.")
+    .Validate(
+        options => !options.Enabled ||
+                   (!string.IsNullOrWhiteSpace(options.Command) &&
+                    !string.IsNullOrWhiteSpace(options.ProjectPath)),
+        "Mcp:Command and Mcp:ProjectPath are required when MCP is enabled.")
+    .Validate(
+        options => !options.RequireApprovalForDraft ||
+                   !string.IsNullOrWhiteSpace(options.ApprovalToken),
+        "Mcp:ApprovalToken is required when MCP draft approval is enabled.")
+    .ValidateOnStart();
+
+builder.Services
     .AddOptions<ToolGovernanceOptions>()
     .Bind(builder.Configuration.GetSection(ToolGovernanceOptions.SectionName))
     .Validate(
@@ -126,6 +150,7 @@ builder.Services.AddHttpClient(
 
 builder.Services.AddSingleton<ToolInvocationContext>();
 builder.Services.AddSingleton<ToolGovernanceService>();
+builder.Services.AddSingleton<GovernedMcpToolProvider>();
 builder.Services.AddSingleton<RunEvidenceStore>();
 builder.Services.AddSingleton<RunEvidenceService>();
 builder.Services.AddSingleton<ReliabilityAssessmentService>();
@@ -148,7 +173,8 @@ app.Use(async (context, next) =>
         context.Request.Path.StartsWithSegments("/api/tool-approvals") ||
         context.Request.Path.StartsWithSegments("/api/evidence") ||
         context.Request.Path.StartsWithSegments("/api/reliability") ||
-        context.Request.Path.StartsWithSegments("/api/incidents");
+        context.Request.Path.StartsWithSegments("/api/incidents") ||
+        context.Request.Path.StartsWithSegments("/api/mcp");
 
     if (protectedApi && !ApiKeyGuard.IsAuthorized(context, apiOptions))
     {
@@ -175,9 +201,29 @@ app.MapGet("/health", () => Results.Ok(new
 
 app.MapGet("/ready", async (
     AgentRuntime runtime,
+    GovernedMcpToolProvider mcp,
+    IOptions<McpBridgeOptions> mcpOptions,
     CancellationToken cancellationToken) =>
 {
     var readiness = await runtime.CheckReadinessAsync(cancellationToken);
+
+    if (readiness.Ready &&
+        mcpOptions.Value.Enabled &&
+        mcpOptions.Value.Required)
+    {
+        var mcpStatus = await mcp.GetStatusAsync(
+            initialize: true,
+            cancellationToken);
+
+        if (!mcpStatus.Connected)
+        {
+            readiness = readiness with
+            {
+                Ready = false,
+                Detail = $"Model runtime is ready but required MCP bridge is unavailable: {mcpStatus.Error ?? "unknown error"}"
+            };
+        }
+    }
 
     return Results.Json(
         readiness,
@@ -192,7 +238,8 @@ app.MapGet("/api/config", (
     IOptions<ConversationStoreOptions> conversations,
     IOptions<ToolGovernanceOptions> tools,
     IOptions<RunEvidenceOptions> evidence,
-    IOptions<ReliabilityOptions> reliability) =>
+    IOptions<ReliabilityOptions> reliability,
+    IOptions<McpBridgeOptions> mcp) =>
 {
     var agent = configuration.GetSection(AgentRuntimeOptions.SectionName)
         .Get<AgentRuntimeOptions>() ?? new();
@@ -254,6 +301,20 @@ app.MapGet("/api/config", (
             reliability.Value.ToolDenyRateWarning,
             reliability.Value.ToolDenyRateCritical,
             reliability.Value.ConsecutiveFailuresCritical
+        },
+        mcp = new
+        {
+            mcp.Value.Enabled,
+            mcp.Value.Required,
+            mcp.Value.ReplaceBuiltInTools,
+            mcp.Value.ExposeAdministrativeTools,
+            commandConfigured = !string.IsNullOrWhiteSpace(mcp.Value.Command),
+            projectConfigured = !string.IsNullOrWhiteSpace(mcp.Value.ProjectPath),
+            mcp.Value.RequireApprovalForDraft,
+            approvalTokenConfigured = !string.IsNullOrWhiteSpace(mcp.Value.ApprovalToken),
+            mcp.Value.EnablePolicyLookup,
+            mcp.Value.EnableDraftChangeRequest,
+            mcp.Value.AuditCapacity
         }
     });
 });
@@ -264,6 +325,7 @@ app.MapGet("/api/diagnostics", async (
     ToolGovernanceService tools,
     RunEvidenceStore evidence,
     ReliabilityAssessmentService reliability,
+    GovernedMcpToolProvider mcp,
     CancellationToken cancellationToken) =>
 {
     var removedExpired = conversations.RemoveExpired();
@@ -285,8 +347,23 @@ app.MapGet("/api/diagnostics", async (
             pendingApprovals = tools.PendingApprovalCount
         },
         evidence = evidence.GetSummary(),
-        reliability = reliability.Assess()
+        reliability = reliability.Assess(),
+        mcp = await mcp.GetStatusAsync(
+            initialize: false,
+            cancellationToken)
     });
+});
+
+app.MapGet("/api/mcp/status", async (
+    bool? initialize,
+    GovernedMcpToolProvider mcp,
+    CancellationToken cancellationToken) =>
+{
+    var status = await mcp.GetStatusAsync(
+        initialize ?? false,
+        cancellationToken);
+
+    return Results.Ok(status);
 });
 
 app.MapGet("/api/tools", (
