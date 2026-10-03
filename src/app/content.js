@@ -193,6 +193,7 @@ export const copy = {
       ['LAB 11', 'Run evidence & correlation', 'Run IDs, trace IDs, metadata-only evidence and tool-audit correlation.'],
       ['LAB 12', 'Operations dashboard', 'Evidence export, KPIs, filters, run drill-down and tool-decision correlation.'],
       ['LAB 13', 'Governed MCP server', 'Real stdio, tool discovery, risk metadata, block policy, operator approval and audit.'],
+      ['LAB 14', 'Reliability & incident operations', 'Thresholds, findings, error taxonomy, incident snapshot and recovery gate.'],
       ['CAPSTONE', 'Customer-ready POC', 'Assessment, architecture, controls, demo, runbook and roadmap.']
     ],
     developerTitle: 'Developer path: from an existing agent to Agent 365',
@@ -209,7 +210,8 @@ export const copy = {
       ['09', 'Govern tools', 'Classify tools, revoke capabilities, require approval and retain allow/deny evidence.', 'Tool governance', 'docs/en/tutorials/10-tool-governance-runtime.md'],
       ['10', 'Correlate evidence', 'Link run IDs, trace IDs, conversations and tool decisions without storing prompt/response content.', 'Evidence & observability', 'docs/en/tutorials/11-run-evidence-observability.md'],
       ['11', 'Operate', 'Export evidence and inspect KPIs, latency, failures and tool decisions in the site dashboard.', 'Operations dashboard', 'docs/en/tutorials/12-operations-dashboard.md'],
-      ['12', 'Externalize tools', 'Run a real .NET MCP stdio server with policy, audit and operator approval outside the model runtime.', 'Governed MCP server', 'docs/en/tutorials/13-governed-mcp-server.md']
+      ['12', 'Externalize tools', 'Run a real .NET MCP stdio server with policy, audit and operator approval outside the model runtime.', 'Governed MCP server', 'docs/en/tutorials/13-governed-mcp-server.md'],
+      ['13', 'Respond', 'Apply explainable thresholds, identify suspect runs and use an incident-ready snapshot with a recovery gate.', 'Reliability & incidents', 'docs/en/tutorials/14-reliability-incident-operations.md']
     ],
     sourcesTitle: 'Source of truth',
     sourcesIntro: 'The knowledge base always points back to official Microsoft documentation. Preview features should be revalidated before production decisions.',
