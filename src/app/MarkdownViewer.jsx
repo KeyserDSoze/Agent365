@@ -245,7 +245,7 @@ export default function MarkdownViewer({ lang }) {
             <p>{pack.description}</p>
           </div>
           <nav>
-            {[pack.guide, ...pack.items].map(path => {
+            {[pack.overview, pack.guide, ...pack.items].map(path => {
               const item = index.find(entry => entry.path === path)
               const label = item?.title || path.split('/').pop()
               return (
