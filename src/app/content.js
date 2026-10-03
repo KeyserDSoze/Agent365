@@ -63,7 +63,8 @@ export const copy = {
       ['Identity Design Sheet', 'Template per definire identità, trust, token e resource access.'],
       ['Tool Risk Register', 'Template per classificare strumenti e mitigazioni.'],
       ['Data Interaction Matrix', 'Mappa di dati, azioni, policy Purview ed evidenze.'],
-      ['Customer Discovery', 'Domande strutturate per assessment e POC.']
+      ['Customer Discovery', 'Domande strutturate per assessment e POC.'],
+      ['Agent Incident Runbook', 'Checklist operativa per triage, containment, investigation, recovery e chiusura.']
     ],
     trainingTitle: 'Academy: 3 settimane, 45–55 ore',
     trainingIntro: 'Il percorso non misura quante pagine sono state lette: misura evidenze prodotte. Ogni modulo termina con un artefatto o una prova pratica.',
@@ -87,6 +88,7 @@ export const copy = {
       ['LAB 10', 'Tool governance runtime', 'Registry, risk tier, block/unblock, approval one-shot e audit allow/deny.'],
       ['LAB 11', 'Run evidence & correlation', 'Run ID, trace ID, evidence metadata-only e correlation con il tool audit.'],
       ['LAB 12', 'Operations dashboard', 'Evidence export, KPI, filtri, run drill-down e tool decision correlation.'],
+      ['LAB 13', 'Reliability & incident operations', 'Soglie, finding, error taxonomy, incident snapshot e recovery gate.'],
       ['CAPSTONE', 'Customer-ready POC', 'Assessment, architecture, controls, demo, runbook e roadmap.']
     ],
     developerTitle: 'Developer path: dall’agente esistente ad Agent 365',
@@ -102,7 +104,8 @@ export const copy = {
       ['08', 'Harden the POC', 'Aggiungi readiness, access key opzionale, rate limit e limiti di sessione/input.', 'Hardening tutorial', 'docs/tutorials/09-golden-agent-hardening.md'],
       ['09', 'Govern tools', 'Classifica i tool, blocca capability, richiedi approval e conserva evidence di allow/deny.', 'Tool governance', 'docs/tutorials/10-tool-governance-runtime.md'],
       ['10', 'Correlate evidence', 'Collega run ID, trace ID, conversation e decisioni tool senza salvare prompt o risposte.', 'Evidence & observability', 'docs/tutorials/11-run-evidence-observability.md'],
-      ['11', 'Operate', 'Esporta evidence e analizza KPI, latency, failure e tool decision nella dashboard del sito.', 'Operations dashboard', 'docs/tutorials/12-operations-dashboard.md']
+      ['11', 'Operate', 'Esporta evidence e analizza KPI, latency, failure e tool decision nella dashboard del sito.', 'Operations dashboard', 'docs/tutorials/12-operations-dashboard.md'],
+      ['12', 'Respond', 'Applica soglie esplicabili, identifica run sospetti e usa uno snapshot incident-ready con recovery gate.', 'Reliability & incidents', 'docs/tutorials/13-reliability-incident-operations.md']
     ],
     sourcesTitle: 'Source of truth',
     sourcesIntro: 'La knowledge base rimanda sempre alla documentazione Microsoft ufficiale. Le feature in Preview vanno ricontrollate prima di una decisione di produzione.',
@@ -162,7 +165,8 @@ export const copy = {
       ['Identity Design Sheet', 'Template for identity, trust, token and resource access design.'],
       ['Tool Risk Register', 'Template to classify tools and mitigations.'],
       ['Data Interaction Matrix', 'Map data, actions, Purview controls and evidence.'],
-      ['Customer Discovery', 'Structured questions for assessments and POCs.']
+      ['Customer Discovery', 'Structured questions for assessments and POCs.'],
+      ['Agent Incident Runbook', 'Operational checklist for triage, containment, investigation, recovery and closure.']
     ],
     trainingTitle: 'Academy: 3 weeks, 45–55 hours',
     trainingIntro: 'The path does not measure pages read; it measures evidence produced. Every module ends with an artifact or practical validation.',
@@ -186,6 +190,7 @@ export const copy = {
       ['LAB 10', 'Tool governance runtime', 'Registry, risk tiers, block/unblock, one-time approval and allow/deny audit.'],
       ['LAB 11', 'Run evidence & correlation', 'Run IDs, trace IDs, metadata-only evidence and tool-audit correlation.'],
       ['LAB 12', 'Operations dashboard', 'Evidence export, KPIs, filters, run drill-down and tool-decision correlation.'],
+      ['LAB 13', 'Reliability & incident operations', 'Thresholds, findings, error taxonomy, incident snapshot and recovery gate.'],
       ['CAPSTONE', 'Customer-ready POC', 'Assessment, architecture, controls, demo, runbook and roadmap.']
     ],
     developerTitle: 'Developer path: from an existing agent to Agent 365',
@@ -201,7 +206,8 @@ export const copy = {
       ['08', 'Harden the POC', 'Add readiness, optional access-key protection, rate limits and input/session guardrails.', 'Hardening tutorial', 'docs/en/tutorials/09-golden-agent-hardening.md'],
       ['09', 'Govern tools', 'Classify tools, revoke capabilities, require approval and retain allow/deny evidence.', 'Tool governance', 'docs/en/tutorials/10-tool-governance-runtime.md'],
       ['10', 'Correlate evidence', 'Link run IDs, trace IDs, conversations and tool decisions without storing prompt/response content.', 'Evidence & observability', 'docs/en/tutorials/11-run-evidence-observability.md'],
-      ['11', 'Operate', 'Export evidence and inspect KPIs, latency, failures and tool decisions in the site dashboard.', 'Operations dashboard', 'docs/en/tutorials/12-operations-dashboard.md']
+      ['11', 'Operate', 'Export evidence and inspect KPIs, latency, failures and tool decisions in the site dashboard.', 'Operations dashboard', 'docs/en/tutorials/12-operations-dashboard.md'],
+      ['12', 'Respond', 'Apply explainable thresholds, identify suspect runs and use an incident-ready snapshot with a recovery gate.', 'Reliability & incidents', 'docs/en/tutorials/13-reliability-incident-operations.md']
     ],
     sourcesTitle: 'Source of truth',
     sourcesIntro: 'The knowledge base always points back to official Microsoft documentation. Preview features should be revalidated before production decisions.',
