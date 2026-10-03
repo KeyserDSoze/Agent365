@@ -54,5 +54,9 @@ Evidence export, KPIs, filters, run drill-down and tool-decision correlation.
 Stdio, tool discovery, risk metadata, block policy, operator approval and metadata-only audit.  
 **Output:** MCP manifest + handshake/invocation evidence.
 
+## LAB 14 — Reliability & Incident Operations
+Thresholds, findings, error taxonomy, incident snapshot and recovery gate.  
+**Output:** reliability assessment + completed incident runbook.
+
 ## CAPSTONE
 Current-state assessment, baseline, architecture, risk, identity, security/data controls, operating model, POC charter, 30/60/90 and a 20-minute demo.
