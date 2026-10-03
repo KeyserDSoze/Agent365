@@ -1,4 +1,19 @@
-// Starter pattern. Inspect schema first.
+// PURPOSE
+// Turn the inventory baseline into a first governance remediation backlog.
+// The starter pattern looks for missing ownership or essential naming metadata.
+//
+// BEFORE RUNNING
+// Run 01-agent-inventory.kql first and validate the current AgentsInfo schema.
+//
+// EXPECTED OUTPUT
+// Candidate records requiring ownership/metadata review.
+// A query result is a finding candidate, not automatically a governance violation.
+//
+// NEXT
+// Assign an owner/action to each confirmed gap, then continue with
+// 03-agent-tools-mcp.kql for tool/MCP discovery.
+// Full guide: examples/kql/README.md
+
 AgentsInfo
 | where isempty(Owner) or isempty(AgentName)
 | project Timestamp, AgentName, AgentId, AgentType, Platform, Owner, Status
