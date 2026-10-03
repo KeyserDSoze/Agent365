@@ -130,3 +130,34 @@ run evidence
 ```
 
 The local lab writes `incident-snapshot.json`, and the site Operations view surfaces the same reliability findings for drill-down.
+
+
+## Guided journey
+
+The site and the repository now use the same end-to-end structure:
+
+```text
+Understand
+   ↓
+Prepare
+   ↓
+Build
+   ↓
+Govern
+   ↓
+Operate
+```
+
+Every major page, formal chapter and practical asset is connected to one of these stages. The Knowledge Hub exposes a dedicated `/journey` route, while document pages show their journey context, related material and curated next/previous steps.
+
+Practical assets are organized as delivery packs rather than loose files. In particular, the KQL material is presented as a sequence:
+
+```text
+inventory → governance gaps → tools/MCP → remediation/evidence
+```
+
+See:
+- `docs/README.md`
+- `examples/README.md`
+- `examples/kql/README.md`
+- `docs/17-kql-agent-operations.md`

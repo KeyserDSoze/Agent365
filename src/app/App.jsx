@@ -13,6 +13,7 @@ import DeveloperPage from './pages/DeveloperPage.jsx'
 import OperationsPage from './pages/OperationsPage.jsx'
 import SourcesPage from './pages/SourcesPage.jsx'
 import NotFoundPage from './pages/NotFoundPage.jsx'
+import JourneyPage from './pages/JourneyPage.jsx'
 
 export default function App() {
   const [lang, setLang] = useState(() => localStorage.getItem('a365-lang') || 'it')
@@ -34,6 +35,7 @@ export default function App() {
       <Routes>
         <Route element={<SiteShell lang={lang} setLang={setLang} theme={theme} setTheme={setTheme} />}>
           <Route index element={<HomePage lang={lang} />} />
+          <Route path="journey" element={<JourneyPage lang={lang} />} />
           <Route path="architecture" element={<ArchitecturePage lang={lang} />} />
           <Route path="capabilities" element={<CapabilitiesPage lang={lang} />} />
           <Route path="assets" element={<AssetsPage lang={lang} />} />

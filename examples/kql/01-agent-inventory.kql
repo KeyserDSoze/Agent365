@@ -1,4 +1,20 @@
-// Verify current AgentsInfo schema in your tenant.
+// PURPOSE
+// Build the first Agent 365 hunting baseline from AgentsInfo.
+// Use this before looking for governance gaps or tool/MCP exposure.
+//
+// BEFORE RUNNING
+// 1. Verify that AgentsInfo exists in your tenant.
+// 2. Inspect the current schema in Advanced Hunting.
+// 3. Confirm that the projected fields are populated for your platforms.
+//
+// EXPECTED OUTPUT
+// A recent list of agents with identifiers, type, platform and status.
+// Save the query timestamp and result count as assessment evidence.
+//
+// NEXT
+// Continue with 02-governance-gaps.kql.
+// Full guide: examples/kql/README.md
+
 AgentsInfo
 | project Timestamp, AgentName, AgentId, AgentType, Platform, Status
 | order by Timestamp desc

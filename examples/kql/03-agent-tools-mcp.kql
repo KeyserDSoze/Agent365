@@ -1,4 +1,20 @@
-// RawAgentInfo is useful for platform-specific metadata. Validate availability.
+// PURPOSE
+// Identify agent records whose raw metadata contains signals related to
+// tools, connectors or MCP.
+//
+// IMPORTANT
+// This is a discovery pattern. A text match in RawAgentInfo is not proof
+// that a specific tool is active, authorized or risky.
+// Inspect the complete record and validate the platform/tool registry.
+//
+// EXPECTED OUTPUT
+// Candidate agents for deeper tool-governance investigation.
+//
+// NEXT
+// Register confirmed tools in the Tool Risk Register and review
+// docs/07-tools-mcp.md plus the tool-governance runtime tutorial.
+// Full guide: examples/kql/README.md
+
 AgentsInfo
 | where tostring(RawAgentInfo) has_any ("MCP", "tool", "connector")
 | project Timestamp, AgentName, AgentId, Platform, RawAgentInfo

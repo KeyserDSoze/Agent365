@@ -21,7 +21,7 @@ export const copy = {
     principle: 'Principio guida',
     principleText: 'Agent 365 è un control plane trasversale: non “vive dentro Defender”. Microsoft 365 admin center, Entra, Defender e Purview cooperano su piani diversi.',
     nav: {
-      overview: 'Overview', architecture: 'Architettura', domains: 'Domini', examples: 'Esempi', training: 'Training', labs: 'Lab', developer: 'Developer', operations: 'Operations', knowledge: 'Knowledge', sources: 'Fonti'
+      overview: 'Start', journey: 'Percorso', architecture: 'Architettura', domains: 'Domini', examples: 'Esempi', training: 'Academy', labs: 'Lab', developer: 'Developer', operations: 'Operations', knowledge: 'Knowledge', sources: 'Fonti'
     },
     overviewTitle: 'La mappa mentale',
     overviewIntro: 'Per lavorare bene su Agent 365 bisogna distinguere il control plane dai runtime degli agenti. Il valore è portare inventory, identity, access, data protection, threat protection e observability dentro un modello operativo coerente.',
@@ -125,7 +125,7 @@ export const copy = {
     principle: 'Guiding principle',
     principleText: 'Agent 365 is a cross-cutting control plane: it does not “live inside Defender”. Microsoft 365 admin center, Entra, Defender and Purview cooperate across distinct planes.',
     nav: {
-      overview: 'Overview', architecture: 'Architecture', domains: 'Domains', examples: 'Examples', training: 'Training', labs: 'Labs', developer: 'Developer', operations: 'Operations', knowledge: 'Knowledge', sources: 'Sources'
+      overview: 'Start', journey: 'Journey', architecture: 'Architecture', domains: 'Domains', examples: 'Examples', training: 'Academy', labs: 'Labs', developer: 'Developer', operations: 'Operations', knowledge: 'Knowledge', sources: 'Sources'
     },
     overviewTitle: 'The mental model',
     overviewIntro: 'To work effectively with Agent 365, separate the control plane from agent runtimes. The value is bringing inventory, identity, access, data protection, threat protection and observability into one operating model.',
@@ -193,6 +193,7 @@ export const copy = {
       ['LAB 11', 'Run evidence & correlation', 'Run IDs, trace IDs, metadata-only evidence and tool-audit correlation.'],
       ['LAB 12', 'Operations dashboard', 'Evidence export, KPIs, filters, run drill-down and tool-decision correlation.'],
       ['LAB 13', 'Governed MCP server', 'Real stdio, tool discovery, risk metadata, block policy, operator approval and audit.'],
+      ['LAB 14', 'Reliability & incident operations', 'Thresholds, findings, error taxonomy, incident snapshot and recovery gate.'],
       ['CAPSTONE', 'Customer-ready POC', 'Assessment, architecture, controls, demo, runbook and roadmap.']
     ],
     developerTitle: 'Developer path: from an existing agent to Agent 365',
@@ -209,7 +210,8 @@ export const copy = {
       ['09', 'Govern tools', 'Classify tools, revoke capabilities, require approval and retain allow/deny evidence.', 'Tool governance', 'docs/en/tutorials/10-tool-governance-runtime.md'],
       ['10', 'Correlate evidence', 'Link run IDs, trace IDs, conversations and tool decisions without storing prompt/response content.', 'Evidence & observability', 'docs/en/tutorials/11-run-evidence-observability.md'],
       ['11', 'Operate', 'Export evidence and inspect KPIs, latency, failures and tool decisions in the site dashboard.', 'Operations dashboard', 'docs/en/tutorials/12-operations-dashboard.md'],
-      ['12', 'Externalize tools', 'Run a real .NET MCP stdio server with policy, audit and operator approval outside the model runtime.', 'Governed MCP server', 'docs/en/tutorials/13-governed-mcp-server.md']
+      ['12', 'Externalize tools', 'Run a real .NET MCP stdio server with policy, audit and operator approval outside the model runtime.', 'Governed MCP server', 'docs/en/tutorials/13-governed-mcp-server.md'],
+      ['13', 'Respond', 'Apply explainable thresholds, identify suspect runs and use an incident-ready snapshot with a recovery gate.', 'Reliability & incidents', 'docs/en/tutorials/14-reliability-incident-operations.md']
     ],
     sourcesTitle: 'Source of truth',
     sourcesIntro: 'The knowledge base always points back to official Microsoft documentation. Preview features should be revalidated before production decisions.',

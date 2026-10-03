@@ -1,10 +1,7 @@
 export const navRoutes = [
   ['overview', '/'],
-  ['architecture', '/architecture'],
-  ['domains', '/capabilities'],
-  ['examples', '/assets'],
+  ['journey', '/journey'],
   ['training', '/academy'],
-  ['labs', '/labs'],
   ['developer', '/developer'],
   ['operations', '/operations'],
   ['knowledge', '/knowledge'],

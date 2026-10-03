@@ -3,6 +3,12 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { knowledgeRoute, pathFromKnowledgeWildcard } from './routing.js'
+import {
+  getDocumentNeighbors,
+  getJourneyStage,
+  getPackForDocument,
+  getStageForDocument
+} from './journey.js'
 
 function resolveRelative(currentPath, href) {
   if (!href || href.startsWith('#') || /^https?:\/\//i.test(href)) return null
@@ -112,15 +118,23 @@ export default function MarkdownViewer({ lang }) {
       })
   }, [body, kind])
 
-  const languageEntries = useMemo(
-    () => index.filter(item => item.language === 'shared' || item.language === lang),
-    [index, lang]
-  )
-  const currentIndex = languageEntries.findIndex(item => item.path === selectedPath)
-  const previous = currentIndex > 0 ? languageEntries[currentIndex - 1] : null
-  const next = currentIndex >= 0 && currentIndex < languageEntries.length - 1
-    ? languageEntries[currentIndex + 1]
+  const stageId = getStageForDocument(selectedPath)
+  const stage = getJourneyStage(stageId, lang)
+  const pack = getPackForDocument(selectedPath, lang)
+  const neighbors = getDocumentNeighbors(selectedPath, lang)
+  const previous = neighbors.previous
+    ? index.find(item => item.path === neighbors.previous) || null
     : null
+  const next = neighbors.next
+    ? index.find(item => item.path === neighbors.next) || null
+    : null
+  const related = stage
+    ? stage.docs
+        .filter(path => path !== selectedPath)
+        .slice(0, 4)
+        .map(path => index.find(item => item.path === path))
+        .filter(Boolean)
+    : []
 
   useEffect(() => {
     if (!selectedPath && index.length) {
@@ -187,9 +201,16 @@ export default function MarkdownViewer({ lang }) {
 
       <header className="doc-hero">
         <div>
-          <span className="doc-kind">
-            {kind === 'markdown' ? 'MARKDOWN · LOCAL BUILD COPY' : 'SOURCE · LOCAL BUILD COPY'}
-          </span>
+          <div className="doc-hero-meta">
+            <span className="doc-kind">
+              {kind === 'markdown' ? 'MARKDOWN · LOCAL BUILD COPY' : 'SOURCE · LOCAL BUILD COPY'}
+            </span>
+            {stage && (
+              <Link className="doc-stage-badge" to={stage.route}>
+                {stage.number} · {stage.label}
+              </Link>
+            )}
+          </div>
           <h1>{title}</h1>
           <p>{entry?.excerpt || selectedPath}</p>
         </div>
@@ -201,6 +222,45 @@ export default function MarkdownViewer({ lang }) {
           </a>
         </div>
       </header>
+
+      {stage && (
+        <section className="doc-journey-context">
+          <div>
+            <span>{lang === 'it' ? 'NEL PERCORSO' : 'IN THE JOURNEY'}</span>
+            <strong>{stage.number} · {stage.title}</strong>
+            <p>{stage.summary}</p>
+          </div>
+          <div>
+            <Link to="/journey">{lang === 'it' ? 'Vedi tutto il percorso' : 'See full journey'} →</Link>
+            <Link to={stage.route}>{lang === 'it' ? 'Apri la tappa' : 'Open stage'} →</Link>
+          </div>
+        </section>
+      )}
+
+      {pack && (
+        <section className="doc-pack-context">
+          <div>
+            <span>{lang === 'it' ? 'FA PARTE DI UN PACK' : 'PART OF A PACK'}</span>
+            <strong>{pack.title}</strong>
+            <p>{pack.description}</p>
+          </div>
+          <nav>
+            {[pack.overview, pack.guide, ...pack.items].map(path => {
+              const item = index.find(entry => entry.path === path)
+              const label = item?.title || path.split('/').pop()
+              return (
+                <Link
+                  className={path === selectedPath ? 'active' : ''}
+                  to={knowledgeRoute(path)}
+                  key={path}
+                >
+                  {label}
+                </Link>
+              )
+            })}
+          </nav>
+        </section>
+      )}
 
       <div className="doc-layout">
         <aside className="doc-toc">
@@ -260,6 +320,21 @@ export default function MarkdownViewer({ lang }) {
               >
                 {markdown}
               </ReactMarkdown>
+
+              {!!related.length && (
+                <section className="doc-related">
+                  <span>{lang === 'it' ? 'COLLEGATO A QUESTA TAPPA' : 'RELATED TO THIS STAGE'}</span>
+                  <div>
+                    {related.map(item => (
+                      <Link to={knowledgeRoute(item.path)} key={item.path}>
+                        <strong>{item.title}</strong>
+                        <small>{item.excerpt}</small>
+                        <b>→</b>
+                      </Link>
+                    ))}
+                  </div>
+                </section>
+              )}
 
               <nav className="kb-page-nav">
                 {previous ? (

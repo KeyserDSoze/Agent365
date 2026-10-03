@@ -1,5 +1,6 @@
 import OperationsDashboard from '../OperationsDashboard.jsx'
 import PageIntro from '../PageIntro.jsx'
+import JourneyNext from '../JourneyNext.jsx'
 
 export default function OperationsPage({ lang }) {
   return (
@@ -13,6 +14,13 @@ export default function OperationsPage({ lang }) {
             : 'KPIs, latency, failures, correlation, tool decisions and operational findings in a dedicated page.'}
         />
         <OperationsDashboard lang={lang} />
+        <JourneyNext
+          lang={lang}
+          stageId="operate"
+          title={lang === 'it'
+            ? 'La dashboard è la vista operativa: per chiudere il cerchio usa runbook, recovery gate e customer delivery pack.'
+            : 'The dashboard is the operational view: close the loop with runbooks, recovery gates and the customer delivery pack.'}
+        />
       </section>
     </div>
   )

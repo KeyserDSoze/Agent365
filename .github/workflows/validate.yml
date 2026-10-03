@@ -38,6 +38,9 @@ jobs:
               'docs/README.md',
               'docs/en/README.md',
               'docs/16-local-model-runtime.md',
+              'docs/17-kql-agent-operations.md',
+              'docs/en/17-kql-agent-operations.md',
+              'examples/kql/README.md',
               'samples/dotnet-golden-agent/README.md',
               'samples/mcp-governed-tools/README.md',
               'examples/evidence/operations-sample.json',
@@ -98,6 +101,10 @@ jobs:
           curl --fail --silent http://127.0.0.1:4173/Agent365/
           curl --fail --silent http://127.0.0.1:4173/Agent365/content/index.json
           curl --fail --silent http://127.0.0.1:4173/Agent365/content/docs/README.md
+          curl --fail --silent http://127.0.0.1:4173/Agent365/journey
           curl --fail --silent http://127.0.0.1:4173/Agent365/architecture
+          curl --fail --silent http://127.0.0.1:4173/Agent365/assets
           curl --fail --silent http://127.0.0.1:4173/Agent365/operations
           curl --fail --silent http://127.0.0.1:4173/Agent365/knowledge/docs/README.md
+          curl --fail --silent http://127.0.0.1:4173/Agent365/knowledge/docs/17-kql-agent-operations.md
+          curl --fail --silent http://127.0.0.1:4173/Agent365/knowledge/examples/kql/01-agent-inventory.kql

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { copy } from './content.js'
 import { navRoutes } from './routing.js'
+import JourneyRibbon from './JourneyRibbon.jsx'
 
 function Brand() {
   return (
@@ -76,6 +77,7 @@ export default function SiteShell({ lang, setLang, theme, setTheme }) {
           </nav>
         )}
       </header>
+      <JourneyRibbon lang={lang} />
       <main className="routed-main"><Outlet /></main>
       <footer>
         <div className="brand footer-brand">

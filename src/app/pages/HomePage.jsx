@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { copy } from '../content.js'
+import { getJourneyStages } from '../journey.js'
 import { knowledgeRoute } from '../routing.js'
 
 function CodePreview() {
@@ -12,12 +13,7 @@ function CodePreview() {
 
 export default function HomePage({ lang }) {
   const t = copy[lang]
-  const explore = [
-    ['Architecture', lang === 'it' ? 'Come si compongono i piani di controllo.' : 'How the control planes fit together.', '/architecture'],
-    ['Developer', lang === 'it' ? 'Percorso tecnico, sample e lab eseguibili.' : 'Technical path, runnable samples and labs.', '/developer'],
-    ['Operations', lang === 'it' ? 'Evidence, reliability e incident operations.' : 'Evidence, reliability and incident operations.', '/operations'],
-    ['Knowledge', lang === 'it' ? 'Manuali e tutorial renderizzati dal repository.' : 'Repository manuals and tutorials, rendered for the web.', '/knowledge']
-  ]
+  const stages = getJourneyStages(lang)
 
   return (
     <>
@@ -29,7 +25,9 @@ export default function HomePage({ lang }) {
           <h1>{t.heroTitle}</h1>
           <p className="hero-copy">{t.heroBody}</p>
           <div className="hero-actions">
-            <Link className="primary link-button" to="/architecture">{t.primaryCta} →</Link>
+            <Link className="primary link-button" to="/journey">
+              {lang === 'it' ? 'Inizia dal percorso' : 'Start the journey'} →
+            </Link>
             <Link className="secondary link-button" to="/academy">{t.secondaryCta}</Link>
             <Link className="secondary link-button" to={knowledgeRoute(lang === 'it' ? 'docs/README.md' : 'docs/en/README.md')}>
               Docs {lang.toUpperCase()} →
@@ -56,20 +54,27 @@ export default function HomePage({ lang }) {
 
       <section className="section home-explore">
         <div className="section-heading">
-          <p className="kicker">EXPLORE</p>
-          <h2>{lang === 'it' ? 'Un hub, pagine distinte.' : 'One hub, distinct pages.'}</h2>
+          <p className="kicker">{lang === 'it' ? 'IL FILO CONDUTTORE' : 'THE THREAD'}</p>
+          <h2>{lang === 'it' ? 'Cinque tappe, un solo percorso.' : 'Five stages, one journey.'}</h2>
           <p>{lang === 'it'
-            ? 'Ogni area ha ora una route dedicata e condivisibile: niente più pagina unica da scorrere.'
-            : 'Every area now has its own shareable route instead of one long page.'}</p>
+            ? 'Puoi seguirle in ordine oppure entrare direttamente dalla tappa che corrisponde al lavoro che devi fare.'
+            : 'Follow them in order or jump directly to the stage that matches the job you need to do.'}</p>
         </div>
-        <div className="home-route-grid">
-          {explore.map(([title, text, route]) => (
-            <Link to={route} className="home-route-card" key={route}>
-              <span>→</span>
-              <h3>{title}</h3>
-              <p>{text}</p>
+
+        <div className="home-journey-grid">
+          {stages.map(stage => (
+            <Link to={stage.route} className="home-journey-card" key={stage.id}>
+              <span>{stage.number}</span>
+              <small>{stage.label}</small>
+              <h3>{stage.title}</h3>
+              <p>{stage.summary}</p>
+              <strong>{lang === 'it' ? 'Apri la tappa' : 'Open stage'} →</strong>
             </Link>
           ))}
+        </div>
+
+        <div className="home-journey-cta">
+          <Link to="/journey">{lang === 'it' ? 'Vedi il percorso completo con tutte le letture e gli output' : 'See the complete journey with readings and outputs'} →</Link>
         </div>
       </section>
     </>
