@@ -40,7 +40,8 @@ export default function App() {
     'examples/templates/identity-design-sheet.md',
     'examples/templates/tool-risk-register.csv',
     'examples/templates/data-interaction-matrix.csv',
-    'examples/checklists/customer-discovery.md'
+    'examples/checklists/customer-discovery.md',
+    'examples/checklists/agent-incident-runbook.md'
   ]
 
   useEffect(() => {
