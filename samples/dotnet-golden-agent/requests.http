@@ -81,3 +81,11 @@ GET {{host}}/api/evidence/runs?conversationId=replace-with-conversation-id&limit
 ### Portable operations evidence export
 GET {{host}}/api/evidence/export?limit=200
 # X-Api-Key: replace-if-enabled
+
+### Reliability assessment
+GET {{host}}/api/reliability
+# X-Api-Key: replace-if-enabled
+
+### Incident-ready snapshot
+GET {{host}}/api/incidents/snapshot?limit=50
+# X-Api-Key: replace-if-enabled
