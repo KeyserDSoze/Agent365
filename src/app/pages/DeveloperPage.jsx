@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { copy } from '../content.js'
 import { knowledgeRoute } from '../routing.js'
 import PageIntro from '../PageIntro.jsx'
+import JourneyNext from '../JourneyNext.jsx'
 
 export default function DeveloperPage({ lang }) {
   const t = copy[lang]
@@ -26,6 +27,14 @@ export default function DeveloperPage({ lang }) {
           <code>gh skill add microsoft/agent365-skills</code>
           <span>→ setup → register → observability → tools/DLP → validate → operate</span>
         </div>
+
+        <JourneyNext
+          lang={lang}
+          stageId="build"
+          title={lang === 'it'
+            ? 'Quando il runtime funziona, il passo successivo è dimostrare che identità, dati e tool sono governabili.'
+            : 'Once the runtime works, the next step is proving that identity, data and tools are governable.'}
+        />
       </section>
     </div>
   )
