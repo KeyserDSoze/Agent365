@@ -403,6 +403,51 @@ Tutorial:
 - `docs/tutorials/12-operations-dashboard.md`
 - `docs/en/tutorials/12-operations-dashboard.md`
 
+## Reliability & incident operations
+
+The golden agent evaluates recent run evidence against explicit, configurable thresholds.
+
+Assessment:
+
+```text
+GET /api/reliability
+```
+
+Incident-ready snapshot:
+
+```text
+GET /api/incidents/snapshot?limit=50
+```
+
+Default lab thresholds cover:
+- failure rate;
+- average latency;
+- tool deny rate;
+- consecutive failures.
+
+The assessment returns `healthy`, `degraded`, `critical` or `insufficient-data`, plus transparent findings and an intentionally simple score.
+
+The incident snapshot uses:
+
+```text
+agent365-golden-agent-incident/v1
+```
+
+and includes only metadata evidence, suspect runs and correlated tool decisions.
+
+The Windows lab runner writes:
+
+```text
+lab-output/incident-snapshot.json
+```
+
+Runbook:
+- `examples/checklists/agent-incident-runbook.md`
+
+Tutorials:
+- `docs/tutorials/13-reliability-incident-operations.md`
+- `docs/en/tutorials/13-reliability-incident-operations.md`
+
 ## Docker
 
 Build and boot:
