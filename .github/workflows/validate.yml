@@ -40,7 +40,9 @@ jobs:
               'docs/16-local-model-runtime.md',
               'samples/dotnet-golden-agent/README.md',
               'samples/mcp-governed-tools/README.md',
-              'examples/evidence/operations-sample.json'
+              'examples/evidence/operations-sample.json',
+              'examples/checklists/agent-incident-runbook.md',
+              'docs/tutorials/14-reliability-incident-operations.md'
             ];
             if (index.entries.length < 80) throw new Error('Knowledge index unexpectedly small');
             for (const path of required) {
@@ -65,6 +67,12 @@ jobs:
             }
             if (!Array.isArray(operations.runs) || operations.runs.length < 5) {
               throw new Error('Operations sample does not contain enough run evidence');
+            }
+            if (!operations.reliability || !['healthy','degraded','critical','insufficient-data'].includes(operations.reliability.status)) {
+              throw new Error('Operations sample is missing reliability assessment');
+            }
+            if (!Array.isArray(operations.reliability.findings)) {
+              throw new Error('Operations sample reliability findings are invalid');
             }
             console.log('Knowledge artifact OK:', index.entries.length, 'files');
           "
