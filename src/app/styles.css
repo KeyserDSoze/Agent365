@@ -409,6 +409,75 @@ main { overflow: hidden; }
 .ops-privacy strong { display:block; font-size:11px; }
 .ops-privacy small { display:block; margin-top:2px; color:var(--muted); font-size:9px; line-height:1.45; }
 
+
+.ops-reliability {
+  margin:16px 16px 0; border:1px solid var(--line); border-radius:14px; overflow:hidden;
+  background:color-mix(in srgb, var(--bg-elev) 76%, transparent);
+}
+.ops-reliability.healthy { border-color:color-mix(in srgb, var(--good) 35%, var(--line)); }
+.ops-reliability.degraded { border-color:color-mix(in srgb, #e2b25f 45%, var(--line)); }
+.ops-reliability.critical { border-color:color-mix(in srgb, #f06f7d 50%, var(--line)); }
+.ops-reliability.insufficient-data { border-color:color-mix(in srgb, var(--accent) 35%, var(--line)); }
+.ops-reliability-head {
+  min-height:54px; padding:11px 13px; display:flex; align-items:center; justify-content:space-between; gap:14px;
+  border-bottom:1px solid var(--line);
+}
+.ops-reliability-head > div:first-child span,
+.ops-findings-title span,
+.ops-errors > span {
+  display:block; color:var(--muted-2); font-size:8px; font-weight:800; letter-spacing:.13em;
+}
+.ops-reliability-head > div:first-child strong {
+  display:block; margin-top:4px; font-size:15px; text-transform:capitalize;
+}
+.ops-score { text-align:right; }
+.ops-score small { display:block; color:var(--muted-2); font-size:8px; }
+.ops-score strong { display:block; margin-top:2px; font-size:23px; letter-spacing:-.035em; }
+.ops-reliability.healthy .ops-score strong { color:var(--good); }
+.ops-reliability.degraded .ops-score strong { color:#e2b25f; }
+.ops-reliability.critical .ops-score strong { color:#f06f7d; }
+
+.ops-reliability-metrics {
+  display:grid; grid-template-columns:repeat(4,1fr); border-bottom:1px solid var(--line);
+}
+.ops-reliability-metrics > div { padding:11px 13px; border-right:1px solid var(--line); }
+.ops-reliability-metrics > div:last-child { border-right:0; }
+.ops-reliability-metrics span { display:block; color:var(--muted-2); font-size:8px; }
+.ops-reliability-metrics strong { display:block; margin-top:5px; font-size:13px; }
+
+.ops-findings { padding:10px; display:grid; gap:7px; }
+.ops-findings-title {
+  padding:2px 3px 6px; display:flex; align-items:center; justify-content:space-between;
+}
+.ops-findings-title strong { font-size:9px; }
+.ops-findings button {
+  width:100%; padding:10px; display:grid; grid-template-columns:auto minmax(0,1fr) auto; gap:10px;
+  align-items:start; text-align:left; border:1px solid var(--line); border-radius:10px;
+  background:var(--bg-soft); color:var(--text); cursor:pointer;
+}
+.ops-findings button:disabled { cursor:default; }
+.ops-findings button.warning { border-color:color-mix(in srgb, #e2b25f 38%, var(--line)); }
+.ops-findings button.critical { border-color:color-mix(in srgb, #f06f7d 44%, var(--line)); }
+.ops-findings button.info { border-color:color-mix(in srgb, var(--accent) 32%, var(--line)); }
+.ops-findings button > span {
+  margin-top:1px; padding:3px 6px; border-radius:999px; border:1px solid var(--line);
+  color:var(--muted); font-size:7px; text-transform:uppercase; letter-spacing:.08em;
+}
+.ops-findings button strong { display:block; font-size:9px; }
+.ops-findings button p { margin:3px 0 0; color:var(--muted); font-size:8px; line-height:1.45; }
+.ops-findings button small { display:block; margin-top:5px; color:var(--muted-2); font-size:8px; line-height:1.45; }
+.ops-findings button b { color:var(--muted-2); font-size:12px; }
+
+.ops-errors {
+  padding:10px 13px 13px; border-top:1px solid var(--line);
+}
+.ops-errors > div { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.ops-errors small {
+  padding:5px 7px; border:1px solid var(--line); border-radius:8px; background:var(--bg-soft);
+  color:var(--muted); font-size:8px;
+}
+.ops-errors small b { color:var(--text); margin-right:3px; }
+
 .ops-kpis {
   padding:16px; display:grid; grid-template-columns:repeat(4,1fr); gap:10px;
 }
@@ -548,6 +617,9 @@ footer p { color:var(--muted-2); font-size:10px; text-align:right; }
   .ops-actions { width:100%; }
   .ops-actions button { flex:1; }
   .ops-kpis { grid-template-columns:repeat(2,1fr); }
+  .ops-reliability-metrics { grid-template-columns:repeat(2,1fr); }
+  .ops-reliability-metrics > div:nth-child(2) { border-right:0; }
+  .ops-reliability-metrics > div:nth-child(-n+2) { border-bottom:1px solid var(--line); }
   .ops-grid { grid-template-columns:1fr; }
   .ops-panel-head { align-items:flex-start; flex-direction:column; }
   .ops-filters { width:100%; }
