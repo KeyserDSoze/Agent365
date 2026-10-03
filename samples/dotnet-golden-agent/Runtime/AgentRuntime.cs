@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Agent365.GoldenAgent.Configuration;
+using Agent365.GoldenAgent.Mcp;
 using Agent365.GoldenAgent.Tools;
 using Azure.AI.OpenAI;
 using Azure.Identity;
@@ -17,23 +18,35 @@ public sealed class AgentRuntime
     private readonly IHttpClientFactory _httpClientFactory;
     private readonly ToolGovernanceService _tools;
     private readonly ToolInvocationContext _toolContext;
-    private readonly Lazy<AIAgent> _agent;
+    private readonly GovernedMcpToolProvider _mcp;
+    private readonly McpBridgeOptions _mcpOptions;
+    private readonly Lazy<Task<AIAgent>> _agent;
 
     public AgentRuntime(
         IOptions<AgentRuntimeOptions> options,
         IHttpClientFactory httpClientFactory,
         ToolGovernanceService tools,
-        ToolInvocationContext toolContext)
+        ToolInvocationContext toolContext,
+        GovernedMcpToolProvider mcp,
+        IOptions<McpBridgeOptions> mcpOptions)
     {
         _options = options.Value;
         _httpClientFactory = httpClientFactory;
         _tools = tools;
         _toolContext = toolContext;
-        _agent = new Lazy<AIAgent>(CreateAgent, LazyThreadSafetyMode.ExecutionAndPublication);
+        _mcp = mcp;
+        _mcpOptions = mcpOptions.Value;
+        _agent = new Lazy<Task<AIAgent>>(
+            () => CreateAgentAsync(CancellationToken.None),
+            LazyThreadSafetyMode.ExecutionAndPublication);
     }
 
-    public Task<AgentSession> CreateSessionAsync(CancellationToken cancellationToken) =>
-        _agent.Value.CreateSessionAsync(cancellationToken).AsTask();
+    public async Task<AgentSession> CreateSessionAsync(
+        CancellationToken cancellationToken)
+    {
+        var agent = await _agent.Value.WaitAsync(cancellationToken);
+        return await agent.CreateSessionAsync(cancellationToken);
+    }
 
     public async Task<string> RunAsync(
         string message,
@@ -48,7 +61,9 @@ public sealed class AgentRuntime
             runId,
             traceId);
 
-        AgentResponse response = await _agent.Value.RunAsync(
+        var agent = await _agent.Value.WaitAsync(cancellationToken);
+
+        AgentResponse response = await agent.RunAsync(
             message,
             session,
             cancellationToken: cancellationToken);
@@ -164,7 +179,8 @@ public sealed class AgentRuntime
             $"Unsupported Agent:Provider '{_options.Provider}'.");
     }
 
-    private AIAgent CreateAgent()
+    private async Task<AIAgent> CreateAgentAsync(
+        CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(_options.Model))
         {
@@ -173,11 +189,19 @@ public sealed class AgentRuntime
                 "For Foundry Local, run scripts/start-foundry-local.ps1 first.");
         }
 
-        var tools = new List<AITool>
+        var tools = new List<AITool>();
+
+        if (!_mcpOptions.Enabled || !_mcpOptions.ReplaceBuiltInTools)
         {
-            AIFunctionFactory.Create(LookupPolicy),
-            AIFunctionFactory.Create(CreateDraftChangeRequest)
-        };
+            tools.Add(AIFunctionFactory.Create(LookupPolicy));
+            tools.Add(AIFunctionFactory.Create(CreateDraftChangeRequest));
+        }
+
+        if (_mcpOptions.Enabled)
+        {
+            var mcpTools = await _mcp.GetAgentToolsAsync(cancellationToken);
+            tools.AddRange(mcpTools);
+        }
 
         IChatClient chatClient = _options.Provider.Trim().ToLowerInvariant() switch
         {
