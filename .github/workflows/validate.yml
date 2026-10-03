@@ -74,6 +74,9 @@ jobs:
             if (!Array.isArray(operations.reliability.findings)) {
               throw new Error('Operations sample reliability findings are invalid');
             }
+            if (!existsSync('./dist/404.html')) {
+              throw new Error('GitHub Pages SPA fallback is missing');
+            }
             console.log('Knowledge artifact OK:', index.entries.length, 'files');
           "
 
@@ -95,3 +98,6 @@ jobs:
           curl --fail --silent http://127.0.0.1:4173/Agent365/
           curl --fail --silent http://127.0.0.1:4173/Agent365/content/index.json
           curl --fail --silent http://127.0.0.1:4173/Agent365/content/docs/README.md
+          curl --fail --silent http://127.0.0.1:4173/Agent365/architecture
+          curl --fail --silent http://127.0.0.1:4173/Agent365/operations
+          curl --fail --silent http://127.0.0.1:4173/Agent365/knowledge/docs/README.md
