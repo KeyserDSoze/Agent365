@@ -113,6 +113,7 @@ const stages = [
     docs: {
       it: [
         'docs/05-defender.md',
+        'docs/17-kql-agent-operations.md',
         'examples/kql/README.md',
         'examples/kql/01-agent-inventory.kql',
         'examples/kql/02-governance-gaps.kql',
@@ -127,6 +128,7 @@ const stages = [
       ],
       en: [
         'docs/en/05-defender.md',
+        'docs/en/17-kql-agent-operations.md',
         'examples/kql/README.md',
         'examples/kql/01-agent-inventory.kql',
         'examples/kql/02-governance-gaps.kql',
@@ -266,6 +268,9 @@ export function getKqlPack(lang = 'it') {
     description: lang === 'it'
       ? 'Tre query starter da usare come sequenza: inventario → gap di governance → tool e MCP.'
       : 'Three starter queries intended as a sequence: inventory → governance gaps → tools and MCP.',
+    overview: lang === 'it'
+      ? 'docs/17-kql-agent-operations.md'
+      : 'docs/en/17-kql-agent-operations.md',
     guide: 'examples/kql/README.md',
     items: [
       'examples/kql/01-agent-inventory.kql',
@@ -276,6 +281,10 @@ export function getKqlPack(lang = 'it') {
 }
 
 export function getPackForDocument(path, lang = 'it') {
-  if (path?.startsWith('examples/kql/')) return getKqlPack(lang)
+  if (
+    path?.startsWith('examples/kql/') ||
+    path === 'docs/17-kql-agent-operations.md' ||
+    path === 'docs/en/17-kql-agent-operations.md'
+  ) return getKqlPack(lang)
   return null
 }
