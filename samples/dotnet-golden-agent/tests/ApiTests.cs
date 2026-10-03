@@ -181,7 +181,13 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     [Fact]
     public async Task ReliabilityAssessment_IsAvailableAndPrivacySafe()
     {
-        using var client = _factory.CreateClient();
+        using var factory = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.UseSetting("Reliability:WindowRuns", "500");
+            builder.UseSetting("Reliability:MinimumRuns", "500");
+        });
+
+        using var client = factory.CreateClient();
 
         var json = await client.GetStringAsync("/api/reliability");
 
