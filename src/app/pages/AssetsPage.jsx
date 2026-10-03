@@ -40,7 +40,8 @@ export default function AssetsPage({ lang }) {
         : 'These are not three unrelated queries: they form a hunting sequence to build inventory, find gaps and understand tool/MCP exposure.',
       start: it ? 'Apri prima la guida del pack: spiega schema, prerequisiti, output e come leggere ogni query.' : 'Open the pack guide first: it explains schema, prerequisites, outputs and how to use each query.',
       items: [
-        ['examples/kql/README.md', it ? 'Guida al KQL Operations Pack' : 'KQL Operations Pack guide', it ? 'Perché esiste, quando usarlo e come adattarlo al tenant.' : 'Why it exists, when to use it and how to adapt it to the tenant.', 'GUIDE'],
+        [it ? 'docs/17-kql-agent-operations.md' : 'docs/en/17-kql-agent-operations.md', it ? 'KQL per Agent 365 — guida completa' : 'KQL for Agent 365 — full guide', it ? 'Flusso inventory → gap → tool/MCP, evidence e remediation.' : 'Inventory → gap → tool/MCP flow, evidence and remediation.', 'THEORY'],
+        ['examples/kql/README.md', it ? 'Guida al KQL Operations Pack' : 'KQL Operations Pack guide', it ? 'Indice operativo delle query, prerequisiti e sequenza consigliata.' : 'Operational query index, prerequisites and recommended sequence.', 'GUIDE'],
         ['examples/kql/01-agent-inventory.kql', '01 · Agent inventory', it ? 'Baseline AgentsInfo e segmentazione iniziale.' : 'AgentsInfo baseline and initial segmentation.', 'KQL'],
         ['examples/kql/02-governance-gaps.kql', '02 · Governance gaps', it ? 'Owner e metadata mancanti da trasformare in remediation backlog.' : 'Missing owners and metadata to turn into a remediation backlog.', 'KQL'],
         ['examples/kql/03-agent-tools-mcp.kql', '03 · Tools & MCP', it ? 'Segnali su tool, connector e server MCP nel metadata disponibile.' : 'Signals for tools, connectors and MCP servers in available metadata.', 'KQL']
