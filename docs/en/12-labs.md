@@ -50,5 +50,9 @@ Run IDs, trace IDs, privacy-safe evidence, tool-audit correlation and operationa
 Evidence export, KPIs, filters, run drill-down and tool-decision correlation.  
 **Output:** operations export JSON + dashboard walkthrough.
 
+## LAB 13 — Reliability & Incident Operations
+Thresholds, findings, error taxonomy, incident snapshot and recovery gate.  
+**Output:** reliability assessment + completed incident runbook.
+
 ## CAPSTONE
 Current-state assessment, baseline, architecture, risk, identity, security/data controls, operating model, POC charter, 30/60/90 and a 20-minute demo.
