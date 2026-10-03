@@ -111,3 +111,22 @@ It uses the official C# MCP SDK and demonstrates:
 - real MCP client/server handshake and invocation tests.
 
 The MCP sample is intentionally independent from the .NET 8 golden agent.
+
+
+## Reliability and incident workflow
+
+The golden agent adds explainable reliability assessment on top of run evidence. Thresholds cover failure rate, latency, tool deny rate and consecutive failures.
+
+The operational flow is:
+
+```text
+run evidence
+  → reliability assessment
+  → finding
+  → suspect run / trace correlation
+  → incident snapshot
+  → runbook
+  → recovery gate
+```
+
+The local lab writes `incident-snapshot.json`, and the site Operations view surfaces the same reliability findings for drill-down.
