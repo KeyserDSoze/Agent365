@@ -237,9 +237,39 @@ try {
 
     $report.outputs.operationsExport = $operationsExportPath
     $report.checks.operationsExport = Test-Path $operationsExportPath
-    $report.success = $true
 
     Write-Host "Dashboard bundle: $operationsExportPath"
+
+    Write-Host ""
+    Write-Host "=== 8. Reliability & incident snapshot ==="
+
+    $reliability = Invoke-RestMethod -Uri "$agentUrl/api/reliability" -Method Get
+    $incident = Invoke-RestMethod -Uri "$agentUrl/api/incidents/snapshot?limit=50" -Method Get
+
+    if ($reliability.capturesContent -ne $false) {
+        throw "Reliability assessment unexpectedly reports content capture."
+    }
+
+    if ($incident.schema -ne "agent365-golden-agent-incident/v1") {
+        throw "Unexpected incident snapshot schema: $($incident.schema)"
+    }
+
+    if ($incident.capturesContent -ne $false) {
+        throw "Incident snapshot unexpectedly reports content capture."
+    }
+
+    $incidentPath = Join-Path $outputDir "incident-snapshot.json"
+    $incident |
+        ConvertTo-Json -Depth 20 |
+        Set-Content -Path $incidentPath -Encoding UTF8
+
+    $report.responses.reliability = $reliability
+    $report.outputs.incidentSnapshot = $incidentPath
+    $report.checks.incidentSnapshot = Test-Path $incidentPath
+    $report.success = $true
+
+    Write-Host "Reliability status: $($reliability.assessment.status)"
+    Write-Host "Incident snapshot: $incidentPath"
     Write-Host ""
     Write-Host "LOCAL LAB: PASS"
 }
