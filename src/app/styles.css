@@ -1129,3 +1129,12 @@ footer p { color:var(--muted-2); font-size:10px; text-align:right; }
   .toolkit-item { grid-template-columns:48px 1fr auto; }
   .doc-related > div { grid-template-columns:1fr; }
 }
+
+
+.week-stage-tags { display:flex; flex-wrap:wrap; gap:5px; margin-bottom:16px; }
+.week-stage-tags span {
+  padding:4px 7px; border:1px solid color-mix(in srgb,var(--accent) 34%,var(--line));
+  border-radius:999px; background:var(--accent-soft); color:var(--accent);
+  font-size:7px; font-weight:800; letter-spacing:.08em;
+}
+.academy-actions { align-items:center; }
