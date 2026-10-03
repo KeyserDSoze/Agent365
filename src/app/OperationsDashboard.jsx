@@ -62,7 +62,8 @@ function normalizeBundle(raw) {
     runs,
     summary: raw?.summary || calculateSummary(runs),
     toolAudit: Array.isArray(raw?.toolAudit) ? raw.toolAudit : [],
-    tools: Array.isArray(raw?.tools) ? raw.tools : []
+    tools: Array.isArray(raw?.tools) ? raw.tools : [],
+    reliability: raw?.reliability || null
   }
 }
 
@@ -147,6 +148,19 @@ export default function OperationsDashboard({ lang }) {
   const successRate = summary.bufferedRuns
     ? Math.round((summary.successfulRuns / summary.bufferedRuns) * 100)
     : 0
+  const reliability = bundle.reliability
+  const errorTypes = reliability?.errorTypes
+    ? Object.entries(reliability.errorTypes)
+    : []
+
+  const inspectFinding = finding => {
+    const runId = finding?.runIds?.[0]
+    if (runId) {
+      setSelectedRunId(runId)
+      setStatus('all')
+      setProvider('all')
+    }
+  }
 
   return (
     <div className="ops-shell">
@@ -197,6 +211,83 @@ export default function OperationsDashboard({ lang }) {
           </small>
         </div>
       </div>
+
+      {reliability && (
+        <div className={`ops-reliability ${reliability.status}`}>
+          <div className="ops-reliability-head">
+            <div>
+              <span>RELIABILITY</span>
+              <strong>{reliability.status}</strong>
+            </div>
+            <div className="ops-score">
+              <small>{lang === 'it' ? 'Score trasparente' : 'Transparent score'}</small>
+              <strong>{reliability.score ?? '—'}</strong>
+            </div>
+          </div>
+
+          <div className="ops-reliability-metrics">
+            <div>
+              <span>Failure rate</span>
+              <strong>{Math.round(Number(reliability.failureRate || 0) * 100)}%</strong>
+            </div>
+            <div>
+              <span>{lang === 'it' ? 'Latency media' : 'Avg latency'}</span>
+              <strong>{formatMs(reliability.averageLatencyMs)}</strong>
+            </div>
+            <div>
+              <span>Tool deny rate</span>
+              <strong>{Math.round(Number(reliability.toolDenyRate || 0) * 100)}%</strong>
+            </div>
+            <div>
+              <span>{lang === 'it' ? 'Failure consecutive' : 'Consecutive failures'}</span>
+              <strong>{reliability.consecutiveFailures || 0}</strong>
+            </div>
+          </div>
+
+          <div className="ops-findings">
+            <div className="ops-findings-title">
+              <span>{lang === 'it' ? 'FINDING OPERATIVI' : 'OPERATIONAL FINDINGS'}</span>
+              <strong>{reliability.findings?.length || 0}</strong>
+            </div>
+
+            {(reliability.findings || []).map(finding => (
+              <button
+                key={finding.code}
+                className={finding.severity}
+                onClick={() => inspectFinding(finding)}
+                disabled={!finding.runIds?.length}
+              >
+                <span>{finding.severity}</span>
+                <div>
+                  <strong>{finding.title}</strong>
+                  <p>{finding.detail}</p>
+                  <small>{finding.recommendedAction}</small>
+                </div>
+                <b>{finding.runIds?.length ? '→' : '·'}</b>
+              </button>
+            ))}
+
+            {!reliability.findings?.length && (
+              <p className="ops-empty">
+                {lang === 'it'
+                  ? 'Nessuna soglia operativa superata.'
+                  : 'No operational threshold crossed.'}
+              </p>
+            )}
+          </div>
+
+          {!!errorTypes.length && (
+            <div className="ops-errors">
+              <span>{lang === 'it' ? 'ERROR TAXONOMY' : 'ERROR TAXONOMY'}</span>
+              <div>
+                {errorTypes.map(([name, count]) => (
+                  <small key={name}><b>{count}</b> {name}</small>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="ops-kpis">
         <article>
