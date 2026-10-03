@@ -1,28 +1,73 @@
-# Agent 365 Academy — English knowledge base
+# Agent 365 Academy — from theory to delivery
 
-This folder mirrors the formal Agent 365 study material in English.
+This folder contains the formal technical foundation. The React site under `src/` is the navigable experience; `docs/` is the study and design reference.
 
 **Verified:** October 2, 2026.
 
-## Chapters
+## How to use this knowledge base
 
-| # | Chapter | Goal |
-|---|---|---|
-| 01 | [Foundations](01-foundations.md) | Build the correct mental model |
-| 02 | [Architecture](02-architecture.md) | Separate management, identity, security, data and integration planes |
-| 03 | [Registry & Governance](03-registry-governance.md) | Inventory, ownership and lifecycle |
-| 04 | [Entra Agent ID](04-entra-agent-id.md) | Identity and access |
-| 05 | [Defender](05-defender.md) | Posture, hunting and response |
-| 06 | [Purview](06-purview.md) | Data security and compliance |
-| 07 | [Tools & MCP](07-tools-mcp.md) | Tool governance |
-| 08 | [Observability](08-observability.md) | Telemetry, retention and residency |
-| 09 | [SDK & CLI](09-sdk-cli.md) | Custom-agent onboarding |
-| 10 | [Operating Model](10-operating-model.md) | RACI, runbooks and KPIs |
-| 11 | [Training Plan](11-training-plan.md) | 3-week academy |
-| 12 | [Labs](12-labs.md) | Hands-on practice |
-| 13 | [Customer Delivery](13-customer-delivery.md) | Assessment, POC and roadmap |
-| 14 | [Official Sources](14-sources.md) | Microsoft source of truth |
-| 15 | [Connected Platforms](15-connected-platforms.md) | Third-party platform synchronization |\n| 16 | [Local Model Runtime](16-local-model-runtime.md) | Foundry Local, on-device LLMs and provider boundary |
+Do not read the chapters as a flat list. The recommended journey is:
+
+**Understand → Prepare → Build → Govern → Operate**
+
+Follow it in sequence or enter directly at the stage matching the work you need to do.
+
+## 01 · Understand the control plane
+
+1. [Foundations](01-foundations.md)
+2. [Architecture](02-architecture.md)
+3. [Registry & Governance](03-registry-governance.md)
+
+**Expected outcome:** a tenant map and a clear explanation of management, identity, security, data and integration planes.
+
+## 02 · Prepare tenant, identity and assessment
+
+1. [Entra Agent ID](04-entra-agent-id.md)
+2. [Tenant Readiness](../../examples/checklists/tenant-readiness.md)
+3. [Identity Design Sheet](../../examples/templates/identity-design-sheet.md)
+4. [Customer Discovery](../../examples/checklists/customer-discovery.md)
+
+**Expected outcome:** readiness baseline, ownership model, identity design and gap list.
+
+## 03 · Build and integrate
+
+1. [SDK & CLI](09-sdk-cli.md)
+2. [Connected Platforms](15-connected-platforms.md)
+3. [Local Model Runtime](16-local-model-runtime.md)
+4. [Hands-on tutorials](tutorials/README.md)
+5. [Golden Agent .NET](../../samples/dotnet-golden-agent/README.md)
+6. [Governed MCP Server](../../samples/mcp-governed-tools/README.md)
+
+**Expected outcome:** runnable agent, identity/onboarding model, observability and tool boundary.
+
+## 04 · Govern identity, data, security and tools
+
+1. [Defender](05-defender.md)
+2. [KQL for Agent 365](17-kql-agent-operations.md)
+3. [Purview](06-purview.md)
+4. [Tools & MCP](07-tools-mcp.md)
+5. [Tool Risk Register](../../examples/templates/tool-risk-register.csv)
+6. [Data Interaction Matrix](../../examples/templates/data-interaction-matrix.csv)
+
+**Expected outcome:** remediation backlog, tool risk model, data-control design and hunting evidence.
+
+## 05 · Operate, observe and respond
+
+1. [Observability](08-observability.md)
+2. [Operating Model](10-operating-model.md)
+3. [Run Evidence & Correlation](tutorials/11-run-evidence-observability.md)
+4. [Operations Dashboard](tutorials/12-operations-dashboard.md)
+5. [Reliability & Incident Operations](tutorials/14-reliability-incident-operations.md)
+6. [Agent Incident Runbook](../../examples/checklists/agent-incident-runbook.md)
+7. [Customer Delivery](13-customer-delivery.md)
+
+**Expected outcome:** evidence package, runbook, recovery gate and 30/60/90 roadmap.
+
+## Cross-cutting paths
+
+- [Training Plan](11-training-plan.md)
+- [Labs](12-labs.md)
+- [Official Sources](14-sources.md)
 
 ## Method
 
