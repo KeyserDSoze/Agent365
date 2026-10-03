@@ -1,6 +1,7 @@
 using System.Threading.RateLimiting;
 using Agent365.GoldenAgent.Configuration;
 using Agent365.GoldenAgent.Runtime;
+using Agent365.GoldenAgent.Reliability;
 using Agent365.GoldenAgent.Security;
 using Agent365.GoldenAgent.Telemetry;
 using Agent365.GoldenAgent.Tools;
@@ -51,6 +52,35 @@ builder.Services
     .ValidateOnStart();
 
 builder.Services
+    .AddOptions<ReliabilityOptions>()
+    .Bind(builder.Configuration.GetSection(ReliabilityOptions.SectionName))
+    .Validate(
+        options => options.WindowRuns is >= 5 and <= 500,
+        "Reliability:WindowRuns must be between 5 and 500.")
+    .Validate(
+        options => options.MinimumRuns is >= 1 and <= 500 &&
+                   options.MinimumRuns <= options.WindowRuns,
+        "Reliability:MinimumRuns must be between 1 and WindowRuns.")
+    .Validate(
+        options => options.FailureRateWarning is >= 0 and <= 1 &&
+                   options.FailureRateCritical is >= 0 and <= 1 &&
+                   options.FailureRateWarning < options.FailureRateCritical,
+        "Reliability failure-rate thresholds must be valid ratios and warning must be below critical.")
+    .Validate(
+        options => options.ToolDenyRateWarning is >= 0 and <= 1 &&
+                   options.ToolDenyRateCritical is >= 0 and <= 1 &&
+                   options.ToolDenyRateWarning < options.ToolDenyRateCritical,
+        "Reliability tool-deny thresholds must be valid ratios and warning must be below critical.")
+    .Validate(
+        options => options.AverageLatencyWarningMs > 0 &&
+                   options.AverageLatencyCriticalMs > options.AverageLatencyWarningMs,
+        "Reliability latency warning must be positive and below critical.")
+    .Validate(
+        options => options.ConsecutiveFailuresCritical >= 1,
+        "Reliability:ConsecutiveFailuresCritical must be greater than zero.")
+    .ValidateOnStart();
+
+builder.Services
     .AddOptions<ToolGovernanceOptions>()
     .Bind(builder.Configuration.GetSection(ToolGovernanceOptions.SectionName))
     .Validate(
@@ -98,6 +128,7 @@ builder.Services.AddSingleton<ToolInvocationContext>();
 builder.Services.AddSingleton<ToolGovernanceService>();
 builder.Services.AddSingleton<RunEvidenceStore>();
 builder.Services.AddSingleton<RunEvidenceService>();
+builder.Services.AddSingleton<ReliabilityAssessmentService>();
 builder.Services.AddSingleton<AgentRuntime>();
 builder.Services.AddSingleton<ConversationStore>();
 builder.ConfigureAgent365Observability();
@@ -115,7 +146,9 @@ app.Use(async (context, next) =>
         context.Request.Path.StartsWithSegments("/api/tools") ||
         context.Request.Path.StartsWithSegments("/api/tool-audit") ||
         context.Request.Path.StartsWithSegments("/api/tool-approvals") ||
-        context.Request.Path.StartsWithSegments("/api/evidence");
+        context.Request.Path.StartsWithSegments("/api/evidence") ||
+        context.Request.Path.StartsWithSegments("/api/reliability") ||
+        context.Request.Path.StartsWithSegments("/api/incidents");
 
     if (protectedApi && !ApiKeyGuard.IsAuthorized(context, apiOptions))
     {
@@ -158,7 +191,8 @@ app.MapGet("/api/config", (
     IOptions<ApiOptions> api,
     IOptions<ConversationStoreOptions> conversations,
     IOptions<ToolGovernanceOptions> tools,
-    IOptions<RunEvidenceOptions> evidence) =>
+    IOptions<RunEvidenceOptions> evidence,
+    IOptions<ReliabilityOptions> reliability) =>
 {
     var agent = configuration.GetSection(AgentRuntimeOptions.SectionName)
         .Get<AgentRuntimeOptions>() ?? new();
@@ -208,6 +242,18 @@ app.MapGet("/api/config", (
             evidence.Value.Enabled,
             evidence.Value.Capacity,
             capturesContent = false
+        },
+        reliability = new
+        {
+            reliability.Value.WindowRuns,
+            reliability.Value.MinimumRuns,
+            reliability.Value.FailureRateWarning,
+            reliability.Value.FailureRateCritical,
+            reliability.Value.AverageLatencyWarningMs,
+            reliability.Value.AverageLatencyCriticalMs,
+            reliability.Value.ToolDenyRateWarning,
+            reliability.Value.ToolDenyRateCritical,
+            reliability.Value.ConsecutiveFailuresCritical
         }
     });
 });
@@ -217,6 +263,7 @@ app.MapGet("/api/diagnostics", async (
     ConversationStore conversations,
     ToolGovernanceService tools,
     RunEvidenceStore evidence,
+    ReliabilityAssessmentService reliability,
     CancellationToken cancellationToken) =>
 {
     var removedExpired = conversations.RemoveExpired();
@@ -237,7 +284,8 @@ app.MapGet("/api/diagnostics", async (
             auditEvents = tools.AuditCount,
             pendingApprovals = tools.PendingApprovalCount
         },
-        evidence = evidence.GetSummary()
+        evidence = evidence.GetSummary(),
+        reliability = reliability.Assess()
     });
 });
 
@@ -336,10 +384,28 @@ app.MapGet("/api/evidence/summary", (
     });
 });
 
+app.MapGet("/api/reliability", (
+    ReliabilityAssessmentService reliability) =>
+{
+    return Results.Ok(new
+    {
+        capturesContent = false,
+        assessment = reliability.Assess()
+    });
+});
+
+app.MapGet("/api/incidents/snapshot", (
+    int? limit,
+    ReliabilityAssessmentService reliability) =>
+{
+    return Results.Ok(reliability.CreateIncidentSnapshot(limit ?? 50));
+});
+
 app.MapGet("/api/evidence/export", (
     int? limit,
     RunEvidenceStore evidence,
-    ToolGovernanceService tools) =>
+    ToolGovernanceService tools,
+    ReliabilityAssessmentService reliability) =>
 {
     var bounded = Math.Clamp(limit ?? 200, 1, 500);
 
@@ -349,6 +415,7 @@ app.MapGet("/api/evidence/export", (
         generatedAt = DateTimeOffset.UtcNow,
         capturesContent = false,
         summary = evidence.GetSummary(),
+        reliability = reliability.Assess(),
         runs = evidence.Get(bounded),
         toolAudit = tools.GetAudit(bounded),
         tools = tools.GetCatalog()

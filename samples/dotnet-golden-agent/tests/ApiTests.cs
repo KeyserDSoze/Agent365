@@ -179,6 +179,61 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
     }
 
     [Fact]
+    public async Task ReliabilityAssessment_IsAvailableAndPrivacySafe()
+    {
+        using var factory = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.UseSetting("Reliability:WindowRuns", "500");
+            builder.UseSetting("Reliability:MinimumRuns", "500");
+        });
+
+        using var client = factory.CreateClient();
+
+        var json = await client.GetStringAsync("/api/reliability");
+
+        Assert.True(json.Contains("\"capturesContent\":false", StringComparison.OrdinalIgnoreCase));
+        Assert.True(json.Contains("\"status\":\"insufficient-data\"", StringComparison.OrdinalIgnoreCase));
+        Assert.True(json.Contains("minimum-sample-not-reached", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task IncidentSnapshot_HasPortablePrivacySafeContract()
+    {
+        using var client = _factory.CreateClient();
+
+        var json = await client.GetStringAsync("/api/incidents/snapshot?limit=20");
+
+        Assert.True(json.Contains("agent365-golden-agent-incident/v1", StringComparison.Ordinal));
+        Assert.True(json.Contains("\"capturesContent\":false", StringComparison.OrdinalIgnoreCase));
+        Assert.True(json.Contains("\"reliability\"", StringComparison.OrdinalIgnoreCase));
+        Assert.True(json.Contains("\"suspectRuns\"", StringComparison.OrdinalIgnoreCase));
+        Assert.True(json.Contains("\"toolDecisions\"", StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public async Task ReliabilityEndpoints_AreProtected_WhenApiKeyIsRequired()
+    {
+        using var factory = _factory.WithWebHostBuilder(builder =>
+        {
+            builder.UseSetting("Api:RequireApiKey", "true");
+            builder.UseSetting("Api:ApiKey", "unit-test-secret");
+        });
+
+        using var client = factory.CreateClient();
+
+        using var reliability = await client.GetAsync("/api/reliability");
+        using var snapshot = await client.GetAsync("/api/incidents/snapshot");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, reliability.StatusCode);
+        Assert.Equal(HttpStatusCode.Unauthorized, snapshot.StatusCode);
+
+        client.DefaultRequestHeaders.Add("X-Api-Key", "unit-test-secret");
+
+        using var authorized = await client.GetAsync("/api/reliability");
+        Assert.Equal(HttpStatusCode.OK, authorized.StatusCode);
+    }
+
+    [Fact]
     public async Task EvidenceExport_HasPortablePrivacySafeContract()
     {
         using var client = _factory.CreateClient();
@@ -190,6 +245,7 @@ public sealed class ApiTests : IClassFixture<WebApplicationFactory<Program>>
         Assert.True(json.Contains("\"runs\"", StringComparison.OrdinalIgnoreCase));
         Assert.True(json.Contains("\"toolAudit\"", StringComparison.OrdinalIgnoreCase));
         Assert.True(json.Contains("\"tools\"", StringComparison.OrdinalIgnoreCase));
+        Assert.True(json.Contains("\"reliability\"", StringComparison.OrdinalIgnoreCase));
     }
 
     [Fact]
