@@ -68,7 +68,7 @@ public sealed class ReliabilityAssessmentTests
 
         Assert.Equal("critical", result.Status);
         Assert.Equal(40, result.Score);
-        Assert.Equal(3, result.ConsecutiveFailures);
+        Assert.Equal(4, result.ConsecutiveFailures);
         Assert.Equal(4, result.ErrorTypes["ProviderError"]);
         Assert.Contains(result.Findings, x =>
             x.Code == "failure-rate" &&
